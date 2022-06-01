@@ -29,6 +29,7 @@ class Helper {
 
 	async _initializeCryptoKey() {
 		this.cryptoKey = await this._importKey(this.secret);
+		console.log(this.cryptoKey);
 	}
 
 	async _getBuildConfig() {
