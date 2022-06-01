@@ -41,7 +41,7 @@ module.exports = {
 				**Tokens:** ${abbreviateNumber(Account.tokens)}
 				**Total Tokens:** ${abbreviateNumber(Account.totalTokens)}
 				**Boxes Opened:** ${abbreviateNumber(Account.boxesOpened)} 
-				**Daily Token Available:** ${Account.tokensAvailable}
+				**Daily Token Available:** ${new Date().setHours(0, 0, 0, 0) != Date.parse(Account.lastTokenDay) && Account.tokensAvailable == 0 ? '500' : Account.tokensAvailable}
 				**Daily XP Available:** ${Account.xpAvailable}
 				**Time Before Reset:** <t:${Math.round(new Date().setHours(24, 0, 0, 0)) / 1000}:R>`)
 				.addFields(
