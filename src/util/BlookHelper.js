@@ -139,7 +139,7 @@ class BlookList {
 		this.addBlook('Crab', 'Uncommon');
 		this.addBlook('Snow Globe', 'Uncommon');
 		this.addBlook('Holiday Gift', 'Uncommon');
-		this.addBlook('Hot Chcolate', 'Uncommon');
+		this.addBlook('Hot Chocolate', 'Uncommon');
 		this.addBlook('Holiday Wreath', 'Uncommon');
 	}
 
