@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon ./src/loader.js",
-	"start": "nodemon ./src/loader.js",
+    "start": "nodemon ./src/loader.js",
     "deploy": "node ./src/deploy.js"
   },
   "author": "Syfe",
@@ -19,8 +19,6 @@
     "discord.js": "^13.4.0",
     "dotenv": "^10.0.0",
     "nodemon": "^2.0.15",
-    "puppeteer": "^14.1.2",
-    "puppeteer-direct": "github:wix-playground/puppeteer-direct",
     "tough-cookie": "^4.0.0"
   },
   "devDependencies": {

@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
-const puppeteer = require('puppeteer');
 const crypto = require('crypto');
+require('dotenv').config();
 
 class Helper {
 	constructor() {
@@ -32,35 +32,10 @@ class Helper {
 	}
 
 	async _getBuildConfig() {
-		const browser = await puppeteer.launch({
-			args: [
-				'--no-sandbox',
-				'--disable-setuid-sandbox',
-			],
-		});
-		const page = await browser.newPage();
-		await page.goto('https://dashboard.blooket.com/signup');
-		const buildConfig = await page.evaluate(() => {
-			return new Promise((resolve, reject) => {
-				try {
-					const config = window.webpackJsonp
-						.map(e => Object.keys(e[1])
-							.map(t => e[1][t]))
-						.reduce((e, t) => [...e, ...t], [])
-						.find(e => /\w{8}-\w{4}-\w{4}-\w{4}-\w{12}/.test(e.toString()) && /\(new TextEncoder\)\.encode\("(.+?)"\)/.test(e.toString()))
-						.toString();
-					resolve({
-						buildId: config.match(/\w{8}-\w{4}-\w{4}-\w{4}-\w{12}/)[0],
-						secret: config.match(/\(new TextEncoder\)\.encode\("(.+?)"\)/)[1],
-					});
-				}
-				catch (err) {
-					console.log(err);
-					reject(false);
-				}
-			});
-		});
-		await browser.close();
+		const buildConfig = {
+			buildId: process.env.BUILDID,
+			secret: process.env.SECRET,
+		};
 		return buildConfig;
 	}
 
