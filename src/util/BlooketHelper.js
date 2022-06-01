@@ -4,8 +4,8 @@ require('dotenv').config();
 
 class Helper {
 	constructor() {
-		this.buildId = null;
-		this.secret = null;
+		this.buildId = process.env.BUILDID;
+		this.secret = process.env.SECRET;
 		this.cryptoKey = null;
 	}
 
@@ -17,7 +17,7 @@ class Helper {
 	}
 
 	async _doInitialize() {
-		await this._initializeConfig();
+		// await this._initializeConfig();
 		await this._initializeCryptoKey();
 	}
 
