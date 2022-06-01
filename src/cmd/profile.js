@@ -42,7 +42,7 @@ module.exports = {
 				**Total Tokens:** ${abbreviateNumber(Account.totalTokens)}
 				**Boxes Opened:** ${abbreviateNumber(Account.boxesOpened)} 
 				**Daily Token Available:** ${new Date().setHours(0, 0, 0, 0) != Date.parse(Account.lastTokenDay) && Account.tokensAvailable == 0 ? '500' : Account.tokensAvailable}
-				**Daily XP Available:** ${Account.xpAvailable}
+				**Daily XP Available:** ${new Date().setHours(0, 0, 0, 0) != Date.parse(Account.lastTokenDay) && Account.xpAvailable == 0 ? '300' : Account.xpAvailable}
 				**Time Before Reset:** <t:${Math.round(new Date().setHours(24, 0, 0, 0)) / 1000}:R>`)
 				.addFields(
 					{ name: 'Wins', value: `> ${Account.wins} (${Math.round(Account.wins / Account.gamesPlayed * 100)}% win rate)`, inline: true },
