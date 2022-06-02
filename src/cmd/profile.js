@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const ApiHelper = require('../util/ApiHelper');
 const { MessageEmbed } = require('discord.js');
+const { embedCreator } = require('../util/EmbedHelper');
 
 function abbreviateNumber(value) {
 	let newValue = value;
@@ -25,11 +26,25 @@ module.exports = {
 		.setDescription('View a user\'s blooket profile and stats!')
 		.addStringOption(option =>
 			option.setName('username')
-				.setDescription('The username of the user you want to view the profile of.')
-				.setRequired(true)),
+				.setDescription('The username of the user you want to view the profile of.')),
 	async execute(interaction) {
-		const username = interaction.options.getString('username');
+		if (!interaction.inGuild()) {
+			const guildOnlyEmbed = await embedCreator(undefined, 'Only available in a server!', undefined, undefined, 'Please make sure to use this command in a discord server! You can join our discord [here](https://discord.gg/8M7CKGWvS2)!', undefined, undefined, undefined, undefined, undefined);
+			return await interaction.reply({ content: null, embeds: [ guildOnlyEmbed ] });
+		}
+
+		let username = interaction.options.getString('username');
 		await interaction.deferReply();
+
+		if (!username) {
+			const result = await (require('../util/AccountHelper'))(interaction);
+			if (!result) {
+				return;
+			}
+
+			username = result;
+		}
+
 		try {
 			const Account = await ApiHelper.getAccountFromUsername(username);
 
@@ -60,12 +75,13 @@ module.exports = {
 					{ name: 'Factory Upgrades', value: `> ${abbreviateNumber(Account.upgrades)} upgrades`, inline: true },
 				)
 				.setTimestamp(Date.parse(Account.dateCreated))
-				.setFooter(`Account ID: ${Account._id.toString()}`);
+				.setFooter({ text: `Account ID: ${Account._id.toString()}` });
 
-			await interaction.editReply({ content: null, embeds: [ profileEmbed ] });
+			await interaction.editReply({ content: null, embeds: [ profileEmbed ], components: [ ] });
 		}
 		catch {
-			await interaction.editReply({ content: `Couldn't find a profile for user ${username}, are you sure that username is correct?`, ephemeral: true });
+			const accountDoesntExistEmbed = await embedCreator(undefined, 'Can\'t find account!', undefined, undefined, `Couldn't find an account with the username \`\`${username}\`\`, are you sure you've typed the username correct?\n\n*Note: Usernames are case sensitive.*`, undefined, undefined, undefined, undefined, undefined);
+			await interaction.editReply({ content: null, embeds: [ accountDoesntExistEmbed ], components: [ ] });
 		}
 	},
 };

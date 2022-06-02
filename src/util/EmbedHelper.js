@@ -17,13 +17,13 @@ const { MessageEmbed } = require('discord.js');
 */
 exports.embedCreator = (colour, title, url, author, description, thumbnail, fields, image, timestamp, footer) => {
 	const embed = new MessageEmbed()
-		.setColor(colour ? colour : '#223AFF')
+		.setColor(colour ? colour : '#0099ff')
 		.setTitle(title ? title : 'Title')
 		.setURL(url ? url : undefined)
 		.setThumbnail(thumbnail ? thumbnail : undefined)
 		.setImage(image ? image : undefined)
 		.setTimestamp(timestamp ? timestamp : new Date().getTime())
-		.setFooter(footer ? footer : 'Made with BLOOKS');
+		.setFooter(footer ? footer : { text: 'Made with BLOOKS' });
 
 	if (author) embed.setAuthor(author);
 	if (description) embed.setDescription(description);

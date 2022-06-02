@@ -1,8 +1,26 @@
 const fs = require('fs');
+const { DataTypes, Sequelize } = require('sequelize');
 const { Client, Collection, Intents } = require('discord.js');
 require('dotenv').config();
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
+
+const sequelize = new Sequelize({
+	dialect: 'sqlite',
+	storage: 'database.sqlite',
+	logging: false,
+});
+
+client.account = sequelize.define('account', {
+	discordId: {
+		type: DataTypes.INTEGER,
+		unique: true,
+		allowNull: false,
+	},
+	linkedAccounts: DataTypes.JSON,
+	accountLinking: DataTypes.STRING,
+	code: DataTypes.STRING,
+});
 
 const { info, debug } = require('./util/Logger.js');
 
@@ -24,6 +42,16 @@ for (const file of buttonFiles) {
 	info(`Loading button: ${button.data.customId}`);
 	client.buttons.set(button.data.customId, button);
 	debug(`Loaded button: ${button.data.customId}`);
+}
+
+client.modals = new Collection();
+const modalFiles = fs.readdirSync('./src/modal/').filter(file => file.endsWith('.js'));
+
+for (const file of modalFiles) {
+	const modal = require(`./modal/${file}`);
+	info(`Loading modal: ${modal.data.customId}`);
+	client.modals.set(modal.data.customId, modal);
+	debug(`Loaded modal: ${modal.data.customId}`);
 }
 
 const eventFiles = fs.readdirSync('./src/event/').filter(file => file.endsWith('.js'));

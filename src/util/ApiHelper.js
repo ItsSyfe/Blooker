@@ -61,6 +61,27 @@ class Client {
 		const account = await this.getAccountFromUsername(username);
 		return Object.keys(account.unlocks);
 	}
+
+	async getLastGameNameFromUsername(username) {
+		await this._initialize();
+
+		const account = await this.getAccountFromUsername(username);
+		return account.gameHistory[account.gameHistory.length - 1].name;
+	}
+
+	async checkAccountExists(username) {
+		await this._initialize();
+
+		const resStatus = await this.axios.get(`https://api.blooket.com/api/users?name=${username}`)
+			.then(response => response.status == 200)
+			.catch(function(error) {
+				if (error.response) {
+					return error.response.status == 200;
+				}
+			});
+		console.log(resStatus);
+		return resStatus;
+	}
 }
 
 module.exports = new Client();

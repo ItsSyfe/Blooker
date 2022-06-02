@@ -17,9 +17,8 @@ exports.CommandInteraction = async (client, interaction) => {
 };
 
 exports.ButtonInteraction = async (client, interaction) => {
-	const initialExecutor = interaction.message.interaction.user;
 	const executor = interaction.user;
-	debug(`${executor.tag} clicked button: ${interaction.customId} by user ${initialExecutor.tag}`);
+	debug(`${executor.tag} clicked button: ${interaction.customId}`);
 	const button = client.buttons.get(interaction.customId);
 
 
@@ -31,6 +30,23 @@ exports.ButtonInteraction = async (client, interaction) => {
 	}
 	catch (e) {
 		error(`Error executing button: ${button.data.customId}`);
+		debug(e);
+	}
+};
+
+exports.ModalInteraction = async (client, interaction) => {
+	const executor = interaction.user;
+	debug(`Modal ${interaction.customId} submitted by ${executor.tag}`);
+	const modal = client.modals.get(interaction.customId);
+
+	if (!modal) return;
+
+	try {
+		info(`Executing modal: ${modal.data.customId}`);
+		await modal.execute(interaction);
+	}
+	catch (e) {
+		error(`Error executing modal: ${modal.data.customId}`);
 		debug(e);
 	}
 };

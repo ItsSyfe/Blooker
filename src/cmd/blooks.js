@@ -2,6 +2,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageEmbed } = require('discord.js');
 const ApiHelper = require('../util/ApiHelper');
 const BlookHelper = require('../util/BlookHelper');
+const { embedCreator } = require('../util/EmbedHelper');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -9,11 +10,24 @@ module.exports = {
 		.setDescription('View a user\'s blooket blooks!')
 		.addStringOption(option =>
 			option.setName('username')
-				.setDescription('The username of the user you want to view the blooks of.')
-				.setRequired(true)),
+				.setDescription('The username of the user you want to view the blooks of.')),
 	async execute(interaction) {
-		const username = interaction.options.getString('username');
+		if (!interaction.inGuild()) {
+			const guildOnlyEmbed = await embedCreator(undefined, 'Only available in a server!', undefined, undefined, 'Please make sure to use this command in a discord server! You can join our discord [here](https://discord.gg/8M7CKGWvS2)!', undefined, undefined, undefined, undefined, undefined);
+			return await interaction.reply({ content: null, embeds: [ guildOnlyEmbed ] });
+		}
+		let username = interaction.options.getString('username');
 		await interaction.deferReply();
+
+		if (!username) {
+			const result = await (require('../util/AccountHelper'))(interaction);
+			if (!result) {
+				return;
+			}
+
+			username = result;
+		}
+
 		try {
 			const blooks = await ApiHelper.getBlooksFromUsername(username);
 
@@ -38,7 +52,8 @@ module.exports = {
 				**Chromas Collected:** ${ChromaIntersection.length}/${ChromaBlooks.length} (${Math.round((ChromaIntersection.length / ChromaBlooks.length) * 100)}%)
 				**Legendaries Collected:** ${LegendaryIntersection.length}/${LegendaryBlooks.length} (${Math.round((LegendaryIntersection.length / LegendaryBlooks.length) * 100)}%)
 				**Rares Collected:** ${RareIntersection.length}/${RareBlooks.length} (${Math.round((RareIntersection.length / RareBlooks.length) * 100)}%)
-				**Uncommons Collected:** ${UncommonIntersection.length}/${UncommonBlooks.length} (${Math.round((UncommonIntersection.length / UncommonBlooks.length) * 100)}%)`);
+				**Uncommons Collected:** ${UncommonIntersection.length}/${UncommonBlooks.length} (${Math.round((UncommonIntersection.length / UncommonBlooks.length) * 100)}%)`)
+				.setFooter('Made with BLOOKS');
 
 			if (MysticalIntersection.length > 0) {
 				blookEmbed.addField('Mystical Blooks', `>>> ${MysticalIntersection.join(', ')}`);
@@ -60,10 +75,11 @@ module.exports = {
 				blookEmbed.addField('Uncommon Blooks', `>>> ${UncommonIntersection.join(', ')}`);
 			}
 
-			await interaction.editReply({ content: null, embeds: [ blookEmbed ] });
+			await interaction.editReply({ content: null, embeds: [ blookEmbed ], components: [ ] });
 		}
 		catch {
-			await interaction.editReply({ content: `Couldn't find a profile for user ${username}, are you sure that username is correct?`, ephemeral: true });
+			const accountDoesntExistEmbed = await embedCreator(undefined, 'Can\'t find account!', undefined, undefined, `Couldn't find an account with the username \`\`${username}\`\`, are you sure you've typed the username correct?\n\n*Note: Usernames are case sensitive.*`, undefined, undefined, undefined, undefined, undefined);
+			await interaction.editReply({ content: null, embeds: [ accountDoesntExistEmbed ], components: [ ] });
 		}
 	},
 };

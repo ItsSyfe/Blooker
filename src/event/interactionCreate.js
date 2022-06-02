@@ -1,4 +1,4 @@
-const { CommandInteraction, ButtonInteraction } = require('../util/InteractionEventHelper');
+const { CommandInteraction, ButtonInteraction, ModalInteraction } = require('../util/InteractionEventHelper');
 const { debug } = require('../util/Logger.js');
 
 module.exports = {
@@ -8,5 +8,6 @@ module.exports = {
 
 		if (interaction.isCommand()) await CommandInteraction(client, interaction);
 		else if (interaction.isButton()) await ButtonInteraction(client, interaction);
+		else if (interaction.isModalSubmit()) await ModalInteraction(client, interaction);
 	},
 };

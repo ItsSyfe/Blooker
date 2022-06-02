@@ -1,4 +1,4 @@
 const ApiHelper = require('./util/ApiHelper');
 
-ApiHelper.getAccountFromUsername('G11500')
+ApiHelper.checkAccountExists('Ben')
 	.then(console.log);
