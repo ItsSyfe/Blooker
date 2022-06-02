@@ -5,10 +5,14 @@ require('dotenv').config();
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 
-const sequelize = new Sequelize(process.env.DATABASE_URL, {
+const sequelize = new Sequelize(`${process.env.DATABASE_URI}?sslmode=require`, {
+	url: process.env.DATABASE_URI,
 	dialect: 'postgres',
+	// logging: false,
 	dialectOptions: {
-		ssl: true,
+		ssl: {
+			rejectUnauthorized: false,
+		},
 	},
 });
 
