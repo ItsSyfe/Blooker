@@ -1,11 +1,14 @@
 const fs = require('fs');
 const { DataTypes, Sequelize } = require('sequelize');
+const pg = require('pg');
 const { Client, Collection, Intents } = require('discord.js');
 require('dotenv').config();
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 
-const sequelize = new Sequelize(process.env.DATABASE_URL);
+const sequelize = new Sequelize(process.env.DATABASE_URL, {
+	dialectModule: pg,
+});
 
 client.account = sequelize.define('account', {
 	discordId: {
