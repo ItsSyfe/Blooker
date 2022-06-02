@@ -5,16 +5,23 @@ require('dotenv').config();
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 
-const sequelize = new Sequelize(`${process.env.DATABASE_URI}?sslmode=require`, {
-	url: process.env.DATABASE_URI,
-	dialect: 'postgres',
-	// logging: false,
+const sequelize = new Sequelize(process.env.DATABASE_URI, {
 	dialectOptions: {
 		ssl: {
+			require: true,
 			rejectUnauthorized: false,
 		},
 	},
 });
+
+sequelize
+	.authenticate()
+	.then(() => {
+		console.log('Connection has been established successfully.');
+	})
+	.catch(err => {
+		console.error('Unable to connect to the database:', err);
+	});
 
 client.account = sequelize.define('account', {
 	discordId: {
