@@ -25,7 +25,7 @@ sequelize
 
 client.account = sequelize.define('account', {
 	discordId: {
-		type: DataTypes.INTEGER,
+		type: DataTypes.STRING,
 		unique: true,
 		allowNull: false,
 	},
