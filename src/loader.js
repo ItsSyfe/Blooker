@@ -7,6 +7,9 @@ const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 
 const sequelize = new Sequelize(process.env.DATABASE_URL, {
 	dialect: 'postgres',
+	dialectOptions: {
+		ssl: true,
+	},
 });
 
 client.account = sequelize.define('account', {
