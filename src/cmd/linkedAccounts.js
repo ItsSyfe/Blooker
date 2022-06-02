@@ -24,13 +24,13 @@ function abbreviateNumber(value) {
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('linkedaccounts')
-		.setDescription('See what Blooket accounts a user has linked to their discord!')
+		.setDescription('🔗 See what Blooket accounts a user has linked to their discord!')
 		.addUserOption(option => option.setName('target').setDescription('Select a user')),
 	async execute(interaction) {
 		const user = interaction.options.getUser('target');
 		const account = await interaction.client.account.findOne({ where: { discordId: user ? user.id : interaction.user.id } });
 
-		if (!account) {
+		if (!account || !account.linkedAccounts.length > 0) {
 			const noAccount = await embedCreator(undefined, 'No linked accounts!', undefined, undefined, 'If this is your Discord account, use /link to link a blooket account to your discord!', undefined, undefined, undefined, undefined, undefined);
 			return await interaction.reply({ content: null, embeds: [ noAccount ] });
 		}
