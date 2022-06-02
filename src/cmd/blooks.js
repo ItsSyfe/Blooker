@@ -34,12 +34,14 @@ module.exports = {
 			const MysticalBlooks = await BlookHelper.getBlooksByRarity('Mystical');
 			const ChromaBlooks = await BlookHelper.getBlooksByRarity('Chroma');
 			const LegendaryBlooks = await BlookHelper.getBlooksByRarity('Legendary');
+			const EpicBlooks = await BlookHelper.getBlooksByRarity('Epic');
 			const RareBlooks = await BlookHelper.getBlooksByRarity('Rare');
 			const UncommonBlooks = await BlookHelper.getBlooksByRarity('Uncommon');
 
 			const MysticalIntersection = Array.from(MysticalBlooks.map(blook => blook.name)).filter(blook => blooks.includes(blook));
 			const ChromaIntersection = Array.from(ChromaBlooks.map(blook => blook.name)).filter(blook => blooks.includes(blook));
 			const LegendaryIntersection = Array.from(LegendaryBlooks.map(blook => blook.name)).filter(blook => blooks.includes(blook));
+			const EpicIntersection = Array.from(EpicBlooks.map(blook => blook.name)).filter(blook => blooks.includes(blook));
 			const RareIntersection = Array.from(RareBlooks.map(blook => blook.name)).filter(blook => blooks.includes(blook));
 			const UncommonIntersection = Array.from(UncommonBlooks.map(blook => blook.name)).filter(blook => blooks.includes(blook));
 
@@ -51,6 +53,7 @@ module.exports = {
 				**Mysticals Collected:** ${MysticalIntersection.length}/${MysticalBlooks.length} (${Math.round((MysticalIntersection.length / MysticalBlooks.length) * 100)}%)
 				**Chromas Collected:** ${ChromaIntersection.length}/${ChromaBlooks.length} (${Math.round((ChromaIntersection.length / ChromaBlooks.length) * 100)}%)
 				**Legendaries Collected:** ${LegendaryIntersection.length}/${LegendaryBlooks.length} (${Math.round((LegendaryIntersection.length / LegendaryBlooks.length) * 100)}%)
+				**Epics Collected:** ${EpicIntersection.length}/${EpicBlooks.length} (${Math.round((EpicIntersection.length / EpicBlooks.length) * 100)}%)
 				**Rares Collected:** ${RareIntersection.length}/${RareBlooks.length} (${Math.round((RareIntersection.length / RareBlooks.length) * 100)}%)
 				**Uncommons Collected:** ${UncommonIntersection.length}/${UncommonBlooks.length} (${Math.round((UncommonIntersection.length / UncommonBlooks.length) * 100)}%)`)
 				.setFooter('Made with BLOOKS');
@@ -65,6 +68,10 @@ module.exports = {
 
 			if (LegendaryIntersection.length > 0) {
 				blookEmbed.addField('Legendary Blooks', `>>> ${LegendaryIntersection.join(', ')}`);
+			}
+
+			if (EpicIntersection.length > 0) {
+				blookEmbed.addField('Epic Blooks', `>>> ${EpicIntersection.join(', ')}`);
 			}
 
 			if (RareIntersection.length > 0) {

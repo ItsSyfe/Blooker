@@ -35,12 +35,14 @@ module.exports = {
 			const MysticalBlooks = await BlookHelper.getBlooksByRarity('Mystical');
 			const ChromaBlooks = await BlookHelper.getBlooksByRarity('Chroma');
 			const LegendaryBlooks = await BlookHelper.getBlooksByRarity('Legendary');
+			const EpicBlooks = await BlookHelper.getBlooksByRarity('Epic');
 			const RareBlooks = await BlookHelper.getBlooksByRarity('Rare');
 			const UncommonBlooks = await BlookHelper.getBlooksByRarity('Uncommon');
 
 			const MysticalDifference = Array.from(MysticalBlooks.map(blook => blook.name)).filter(blook => !blooks.includes(blook));
 			const ChromaDifference = Array.from(ChromaBlooks.map(blook => blook.name)).filter(blook => !blooks.includes(blook));
 			const LegendaryDifference = Array.from(LegendaryBlooks.map(blook => blook.name)).filter(blook => !blooks.includes(blook));
+			const EpicDifference = Array.from(EpicBlooks.map(blook => blook.name)).filter(blook => !blooks.includes(blook));
 			const RareDifference = Array.from(RareBlooks.map(blook => blook.name)).filter(blook => !blooks.includes(blook));
 			const UncommonDifference = Array.from(UncommonBlooks.map(blook => blook.name)).filter(blook => !blooks.includes(blook));
 
@@ -56,6 +58,10 @@ module.exports = {
 
 			if (LegendaryDifference.length > 0) {
 				description += `\n**Legendaries Missing:** ${LegendaryDifference.length}/${LegendaryBlooks.length} (${Math.round((LegendaryDifference.length / LegendaryBlooks.length) * 100)}%)`;
+			}
+
+			if (EpicDifference.length > 0) {
+				description += `\n**Epics Missing:** ${EpicDifference.length}/${EpicBlooks.length} (${Math.round((EpicDifference.length / EpicBlooks.length) * 100)}%)`;
 			}
 
 			if (RareDifference.length > 0) {
@@ -86,6 +92,10 @@ module.exports = {
 
 			if (LegendaryDifference.length > 0) {
 				blookEmbed.addField('Missing Legendary Blooks', `>>> ${LegendaryDifference.join(', ')}`);
+			}
+
+			if (EpicDifference.length > 0) {
+				blookEmbed.addField('Missing Epic Blooks', `>>> ${EpicDifference.join(', ')}`);
 			}
 
 			if (RareDifference.length > 0) {
