@@ -34,13 +34,13 @@ module.exports = {
 		try {
 			const Account = await ApiHelper.getAccountFromUsername(username);
 
-			const favouriteBlook = await BlookHelper.getBlook(Object.keys(Account.blookUsage).reduce((a, b) => Account.blookUsage[a] > Account.blookUsage[b] ? a : b));
+			const favouriteBlook = Account.blookUsage.length > 0 ? await BlookHelper.getBlook(Object.keys(Account.blookUsage).reduce((a, b) => Account.blookUsage[a] > Account.blookUsage[b] ? a : b)) : false;
 			const date = Date.parse(Account.dateCreated);
 			const profileEmbed = await new MessageEmbed()
 				.setColor(favouriteBlook.color != undefined ? favouriteBlook.color : '#0099ff')
 				.setTitle(`${Account.name}'s Profile${Account.plan == 'Plus' ? ' **+**' : ''}`)
 				.setURL(`https://dashboard.blooket.com/stats?name=${Account.name}`)
-				.setThumbnail(`https://undercovergoose.github.io/blooket-src/blooks/png/${favouriteBlook.box}/${favouriteBlook.id}.png`)
+				.setThumbnail(favouriteBlook ? `https://undercovergoose.github.io/blooket-src/blooks/png/${favouriteBlook.box}/${favouriteBlook.id}.png` : '')
 				.setDescription(`**▸ 🏆 Wins:** ${Account.wins} (${Math.round(Account.wins / Account.gamesPlayed * 100)}% win rate)
 
 					**▸ 🎖️ Top Five Placements:** ${Account.topFives}
@@ -57,9 +57,7 @@ module.exports = {
 
 					**▸ <:b_token:998636743941173288> Total Tokens Earned:** ${abbreviateNumber(Account.totalTokens)}
 
-					**▸ 🔓 Unlock count:** ${abbreviateNumber(Account.boxesOpened)}
-
-					**▸ 🍱 Boxes Opened:** ${abbreviateNumber(Account.boxesOpened)} 
+					**▸ 🔓 Boxes Opened:** ${abbreviateNumber(Account.boxesOpened)}
 
 					**▸ ♻️ Server reset time:** <t:${Math.round(new Date().setHours(24, 0, 0, 0)) / 1000}:R>
 
