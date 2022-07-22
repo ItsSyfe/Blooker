@@ -52,7 +52,7 @@ module.exports = {
 
 			for (const blook of AllIntersection) {
 				const blookData = await BlookHelper.getBlook(blook);
-				sellValue += blookData.sellValue > 0 ? blookData.sellValue : 0;
+				sellValue += blookData.sellValue > 0 ? blookData.sellValue * unlocks[blook] : 0;
 			}
 
 			const navRow = new MessageActionRow()
