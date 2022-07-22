@@ -2,6 +2,8 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const ApiHelper = require('../util/ApiHelper');
 const { MessageEmbed } = require('discord.js');
 const { embedCreator } = require('../util/EmbedHelper');
+const BlookHelper = require('../util/BlookHelper');
+const { debug } = require('../util/Logger');
 
 function abbreviateNumber(value) {
 	let newValue = value;
@@ -44,44 +46,48 @@ module.exports = {
 
 			username = result;
 		}
-
 		try {
 			const Account = await ApiHelper.getAccountFromUsername(username);
 
+			const favouriteBlook = await BlookHelper.getBlook(Object.keys(Account.blookUsage).reduce((a, b) => Account.blookUsage[a] > Account.blookUsage[b] ? a : b));
+			const date = Date.parse(Account.dateCreated);
 			const profileEmbed = await new MessageEmbed()
-				.setColor('#0099ff')
-				.setTitle(`${Account.name}${Account.plan == 'Plus' ? ' **+**' : ''}`)
+				.setColor(favouriteBlook.color != undefined ? favouriteBlook.color : '#0099ff')
+				.setTitle(`${Account.name}'s Profile${Account.plan == 'Plus' ? ' **+**' : ''}`)
 				.setURL(`https://dashboard.blooket.com/stats?name=${Account.name}`)
-				.setDescription(`__Details:__
-				**Tokens:** ${abbreviateNumber(Account.tokens)}
-				**Total Tokens:** ${abbreviateNumber(Account.totalTokens)}
-				**Boxes Opened:** ${abbreviateNumber(Account.boxesOpened)} 
-				**Daily Token Available:** ${new Date().setHours(0, 0, 0, 0) != Date.parse(Account.lastTokenDay) && Account.tokensAvailable == 0 ? '500' : Account.tokensAvailable}
-				**Daily XP Available:** ${new Date().setHours(0, 0, 0, 0) != Date.parse(Account.lastTokenDay) && Account.xpAvailable == 0 ? '300' : Account.xpAvailable}
-				**Time Before Reset:** <t:${Math.round(new Date().setHours(24, 0, 0, 0)) / 1000}:R>`)
-				.addFields(
-					{ name: 'Wins', value: `> ${Account.wins} (${Math.round(Account.wins / Account.gamesPlayed * 100)}% win rate)`, inline: true },
-					{ name: 'Showdown Wins', value: `> ${abbreviateNumber(Account.showdownWins)} wins`, inline: true },
-					{ name: 'Top 5s', value: `> ${Account.topFives}`, inline: true },
-					{ name: 'Players Defeated', value: `> ${abbreviateNumber(Account.playersDefeated)} players`, inline: true },
-					{ name: 'Correct Answers', value: `> ${abbreviateNumber(Account.correctAnswers)} answers`, inline: true },
-					{ name: 'Games Played', value: `> ${abbreviateNumber(Account.gamesPlayed)} games`, inline: true },
-					{ name: 'Total Points', value: `> ${abbreviateNumber(Account.classicPoints)} points`, inline: true },
-					{ name: 'Total Crypto', value: `> ${abbreviateNumber(Account.totalCrypto)} crypto`, inline: true },
-					{ name: 'Total Gold', value: `> ${abbreviateNumber(Account.totalGold)} gold`, inline: true },
-					{ name: 'Total Fish Weight', value: `> ${abbreviateNumber(Account.totalFishWeight)} fish weight`, inline: true },
-					{ name: 'Total Cash', value: `> ${abbreviateNumber(Account.totalCash)} cash`, inline: true },
-					{ name: 'Racing Progress', value: `> ${abbreviateNumber(Account.racingProgress)} progress`, inline: true },
-					{ name: 'Factory Upgrades', value: `> ${abbreviateNumber(Account.upgrades)} upgrades`, inline: true },
-				)
-				.setTimestamp(Date.parse(Account.dateCreated))
-				.setFooter({ text: `Account ID: ${Account._id.toString()}` });
+				.setThumbnail(`https://undercovergoose.github.io/blooket-src/blooks/png/${favouriteBlook.box}/${favouriteBlook.id}.png`)
+				.setDescription(`**▸ 🏆 Wins:** ${Account.wins} (${Math.round(Account.wins / Account.gamesPlayed * 100)}% win rate)
+
+					**▸ 🎖️ Top Five Placements:** ${Account.topFives}
+
+					**▸ 🎲 Total Games Played:** ${abbreviateNumber(Account.gamesPlayed)}
+
+					**▸ <:b_token:998636743941173288> Tokens:** ${abbreviateNumber(Account.tokens)}
+
+					**▸ 🎯 Daily Tokens Available:** ${new Date().setHours(0, 0, 0, 0) != Date.parse(Account.lastTokenDay) && Account.tokensAvailable == 0 ? '500' : Account.tokensAvailable}
+
+					**▸ 🧪 XP:** ${Account.xp}
+
+					**▸ 🎯 Daily XP Available:** ${new Date().setHours(0, 0, 0, 0) != Date.parse(Account.lastTokenDay) && Account.xpAvailable == 0 ? '300' : Account.xpAvailable}
+
+					**▸ <:b_token:998636743941173288> Total Tokens Earned:** ${abbreviateNumber(Account.totalTokens)}
+
+					**▸ 🔓 Unlock count:** ${abbreviateNumber(Account.boxesOpened)}
+
+					**▸ 🍱 Boxes Opened:** ${abbreviateNumber(Account.boxesOpened)} 
+
+					**▸ ♻️ Server reset time:** <t:${Math.round(new Date().setHours(24, 0, 0, 0)) / 1000}:R>
+
+					
+					⌛ Created: <t:${Math.floor(date.valueOf() / 1000)}:R> • ${Account.dateCreated.replace(/T/, ' ').replace(/\..+/, '')}`)
+				.setFooter({ text: `💳 ID: ${Account._id.toString()}` });
 
 			await interaction.editReply({ content: null, embeds: [ profileEmbed ], components: [ ] });
 		}
-		catch {
+		catch (e) {
 			const accountDoesntExistEmbed = await embedCreator(undefined, 'Can\'t find account!', undefined, undefined, `Couldn't find an account with the username \`\`${username}\`\`, are you sure you've typed the username correct?\n\n*Note: Usernames are case sensitive.*`, undefined, undefined, undefined, undefined, undefined);
 			await interaction.editReply({ content: null, embeds: [ accountDoesntExistEmbed ], components: [ ] });
+			debug(e);
 		}
 	},
 };

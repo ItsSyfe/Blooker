@@ -30,7 +30,8 @@ module.exports = {
 		}
 
 		try {
-			const blooks = await ApiHelper.getBlooksFromUsername(username);
+			const unlocks = await ApiHelper.getBlooksFromUsername(username);
+			const blooks = Object.keys(unlocks);
 
 			const MysticalBlooks = await BlookHelper.getBlooksByRarity('Mystical');
 			const ChromaBlooks = await BlookHelper.getBlooksByRarity('Chroma');
@@ -39,12 +40,12 @@ module.exports = {
 			const RareBlooks = await BlookHelper.getBlooksByRarity('Rare');
 			const UncommonBlooks = await BlookHelper.getBlooksByRarity('Uncommon');
 
-			const MysticalDifference = Array.from(MysticalBlooks.map(blook => blook.name)).filter(blook => !blooks.includes(blook));
-			const ChromaDifference = Array.from(ChromaBlooks.map(blook => blook.name)).filter(blook => !blooks.includes(blook));
-			const LegendaryDifference = Array.from(LegendaryBlooks.map(blook => blook.name)).filter(blook => !blooks.includes(blook));
-			const EpicDifference = Array.from(EpicBlooks.map(blook => blook.name)).filter(blook => !blooks.includes(blook));
-			const RareDifference = Array.from(RareBlooks.map(blook => blook.name)).filter(blook => !blooks.includes(blook));
-			const UncommonDifference = Array.from(UncommonBlooks.map(blook => blook.name)).filter(blook => !blooks.includes(blook));
+			const MysticalDifference = MysticalBlooks.filter(blook => !blooks.includes(blook));
+			const ChromaDifference = ChromaBlooks.filter(blook => !blooks.includes(blook));
+			const LegendaryDifference = LegendaryBlooks.filter(blook => !blooks.includes(blook));
+			const EpicDifference = EpicBlooks.filter(blook => !blooks.includes(blook));
+			const RareDifference = RareBlooks.filter(blook => !blooks.includes(blook));
+			const UncommonDifference = UncommonBlooks.filter(blook => !blooks.includes(blook));
 
 			let description = '__Stats:__';
 

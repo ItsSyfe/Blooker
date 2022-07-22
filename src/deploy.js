@@ -15,11 +15,9 @@ for (const file of cmdFiles) {
 
 const rest = new REST({ version: '9' }).setToken(process.env.TOKEN);
 
-/*
 rest.put(Routes.applicationGuildCommands(clientId, guildId), { body: commands })
 	.then(() => console.log('Successfully registered application commands.'))
 	.catch(console.error);
-*/
 
 /*
 rest.put(
@@ -28,6 +26,7 @@ rest.put(
 );
 */
 
+/*
 rest.get(Routes.applicationGuildCommands(clientId, guildId))
 	.then(data => {
 		const promises = [];
@@ -37,3 +36,4 @@ rest.get(Routes.applicationGuildCommands(clientId, guildId))
 		}
 		return Promise.all(promises);
 	});
+*/

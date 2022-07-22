@@ -1,11 +1,12 @@
 /* eslint-disable no-undef */
+const axios = require('axios');
 const crypto = require('crypto');
 require('dotenv').config();
 
 class Helper {
 	constructor() {
-		this.buildId = process.env.BUILDID;
-		this.secret = process.env.SECRET;
+		this.buildId = null;
+		this.secret = null;
 		this.cryptoKey = null;
 	}
 
@@ -17,7 +18,7 @@ class Helper {
 	}
 
 	async _doInitialize() {
-		// await this._initializeConfig();
+		await this._initializeConfig();
 		await this._initializeCryptoKey();
 	}
 
@@ -31,18 +32,27 @@ class Helper {
 		this.cryptoKey = await this._importKey(this.secret);
 	}
 
-	async _getBuildConfig() {
-		const buildConfig = {
-			buildId: process.env.BUILDID,
-			secret: process.env.SECRET,
-		};
-		return buildConfig;
-	}
-
 	async _importKey(key) {
 		return await crypto.subtle.importKey('raw', await crypto.subtle.digest('SHA-256', (new TextEncoder).encode(key)), {
 			name: 'AES-GCM',
 		}, false, ['encrypt', 'decrypt']);
+	}
+
+	async _getBuildConfig() {
+		const response = await axios.get('https://dashboard.blooket.com/api/config').then(res => res.data);
+		const scripts = await response.match(/<script src=".{59,67}">/g).slice(1);
+
+		return new Promise(resolve => {
+			scripts.forEach(async (script) => {
+				const scriptContent = await axios.get(`https://dashboard.blooket.com/${script.split('"')[1]}`).then(res => res.data);
+				if (/\w{8}-\w{4}-\w{4}-\w{4}-\w{12}/.test(scriptContent) && /\(new TextEncoder\)\.encode\("(.+?)"\)/.test(scriptContent)) {
+					resolve({
+						buildId: scriptContent.match(/\w{8}-\w{4}-\w{4}-\w{4}-\w{12}/)[0],
+						secret: scriptContent.match(/\(new TextEncoder\)\.encode\("(.+?)"\)/)[1],
+					});
+				}
+			});
+		});
 	}
 
 	async encrypt(string) {

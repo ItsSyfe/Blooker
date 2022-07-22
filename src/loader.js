@@ -1,26 +1,38 @@
 const fs = require('fs');
+const { info, debug, error } = require('./util/Logger.js');
 const { DataTypes, Sequelize } = require('sequelize');
 const { Client, Collection, Intents } = require('discord.js');
 require('dotenv').config();
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 
-const sequelize = new Sequelize(process.env.DATABASE_URL, {
-	dialectOptions: {
+let dbURL;
+let dialectOptions = {};
+
+if (process.env.DATABASE_URL) {
+	dbURL = process.env.DATABASE_URL;
+	dialectOptions = {
 		ssl: {
 			require: true,
 			rejectUnauthorized: false,
 		},
-	},
+	};
+}
+else {
+	dbURL = process.env.LOCAL_DATABASE_URL;
+}
+
+const sequelize = new Sequelize(dbURL, {
+	dialectOptions,
 });
 
 sequelize
 	.authenticate()
 	.then(() => {
-		console.log('Connection has been established successfully.');
+		info('Connection has been established successfully.');
 	})
 	.catch(err => {
-		console.error('Unable to connect to the database:', err);
+		error('Unable to connect to the database:', err);
 	});
 
 client.account = sequelize.define('account', {
@@ -33,8 +45,6 @@ client.account = sequelize.define('account', {
 	accountLinking: DataTypes.STRING,
 	code: DataTypes.STRING,
 });
-
-const { info, debug } = require('./util/Logger.js');
 
 client.commands = new Collection();
 const cmdFiles = fs.readdirSync('./src/cmd/').filter(file => file.endsWith('.js'));

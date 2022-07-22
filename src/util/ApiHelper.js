@@ -59,7 +59,7 @@ class Client {
 		await this._initialize();
 
 		const account = await this.getAccountFromUsername(username);
-		return Object.keys(account.unlocks);
+		return account.unlocks;
 	}
 
 	async getLastGameNameFromUsername(username) {
