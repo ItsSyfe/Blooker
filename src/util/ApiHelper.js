@@ -17,6 +17,18 @@ class Client {
 
 		const axiosInstanceCookie = wrapper(axiosInstance);
 		this.axios = axiosInstanceCookie;
+
+		this.axios.interceptors.response.use(response => response, async function(error) {
+			const status = error.response ? error.response.status : null;
+
+			if (status == 401) {
+				await BlooketHelper._doInitialize();
+				await this._doInitialize();
+				return this.axios.request(error.config);
+			}
+
+			return Promise.reject(error);
+		});
 	}
 
 	async _doInitialize() {
@@ -79,7 +91,6 @@ class Client {
 					return error.response.status == 200;
 				}
 			});
-		console.log(resStatus);
 		return resStatus;
 	}
 }
