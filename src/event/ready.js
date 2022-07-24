@@ -7,5 +7,6 @@ module.exports = {
 		client.account.sync();
 		debug('Initialized');
 		info(`Logged in as ${client.user.tag}`);
+		client.user.setPresence({ activities: [{ name: 'Blooket Companion Bot', type: 'PLAYING' }] });
 	},
 };
