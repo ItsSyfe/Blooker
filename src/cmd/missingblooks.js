@@ -30,7 +30,10 @@ module.exports = {
 		}
 
 		try {
-			const unlocks = await ApiHelper.getBlooksFromUsername(username);
+			let unlocks = await ApiHelper.getBlooksFromUsername(username);
+
+			unlocks = unlocks ? unlocks : [];
+
 			const blooks = Object.keys(unlocks);
 
 			const MysticalBlooks = await BlookHelper.getBlooksByRarity('Mystical');
