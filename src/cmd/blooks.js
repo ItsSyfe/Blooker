@@ -30,6 +30,16 @@ module.exports = {
 
 		try {
 			const unlocks = await ApiHelper.getBlooksFromUsername(username);
+
+			if (!unlocks) {
+				const noBlooksEmbed = await new MessageEmbed()
+					.setColor('#0099ff')
+					.setTitle(`${username}'s Inventory`)
+					.setURL(`https://dashboard.blooket.com/stats?name=${username}`)
+					.setDescription('**▸ Account has no blooks.**');
+				return await interaction.editReply({ content: null, embeds: [ noBlooksEmbed ], components: [ ] });
+			}
+
 			const blooks = Object.keys(unlocks);
 
 			const AllBlooks = await BlookHelper.getBlooks();
