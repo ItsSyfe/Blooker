@@ -43,16 +43,16 @@ class Client {
 	}
 
 	async _initializeAuth() {
-		await this.axios.get('https://api.blooket.com/api/users/check-auth', {
+		await this.axios.get('https://id.blooket.com/api/users/check-auth', {
 			headers: {
 				'X-Blooket-Build': await BlooketHelper.getBuildId(),
 			},
 		});
 
-		await this.axios.post('https://api.blooket.com/api/users/login', await BlooketHelper.encrypt({
+		await this.axios.post('https://id.blooket.com/api/users/login', {
 			name: this.email,
 			password: this.password,
-		}), {
+		}, {
 			headers: {
 				'X-Blooket-Build': await BlooketHelper.getBuildId(),
 				'Content-Type': 'text/plain',
