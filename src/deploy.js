@@ -1,39 +1,45 @@
-const fs = require('fs');
 const { REST } = require('@discordjs/rest');
-const { Routes } = require('discord-api-types/v9');
-const { clientId, guildId } = require('./config.json');
+const { Routes } = require('discord.js');
+const fs = require('node:fs');
+const dotenv = require('dotenv');
+dotenv.config();
 
-require('dotenv').config();
+const isDevelopment = process.env.NODE_ENV === 'development';
 
 const commands = [];
-const cmdFiles = fs.readdirSync('./src/cmd/').filter(file => file.endsWith('.js'));
+const commandFiles = fs
+	.readdirSync('./src/cmd')
+	.filter((file) => file.endsWith('.js'));
 
-for (const file of cmdFiles) {
-	const cmd = require(`./cmd/${file}`);
-	commands.push(cmd.data.toJSON());
+for (const file of commandFiles) {
+	const command = require(`./cmd/${file}`);
+	commands.push(command.data.toJSON());
 }
 
-const rest = new REST({ version: '9' }).setToken(process.env.TOKEN);
+const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
 
-rest.put(Routes.applicationGuildCommands(clientId, guildId), { body: commands })
-	.then(() => console.log('Successfully registered application commands.'))
-	.catch(console.error);
+(async () => {
+	try {
+		console.log('Started refreshing application (/) commands.');
 
-/*
-rest.put(
-	Routes.applicationCommands(clientId),
-	{ body: commands },
-);
-*/
-
-/*
-rest.get(Routes.applicationGuildCommands(clientId, guildId))
-	.then(data => {
-		const promises = [];
-		for (const command of data) {
-			const deleteUrl = `${Routes.applicationGuildCommands(clientId, guildId)}/${command.id}`;
-			promises.push(rest.delete(deleteUrl));
+		if (isDevelopment) {
+			await rest.put(
+				Routes.applicationGuildCommands(
+					process.env.CLIENTID,
+					process.env.GUILDID,
+				),
+				{ body: commands },
+			);
 		}
-		return Promise.all(promises);
-	});
-*/
+		else {
+			await rest.put(Routes.applicationCommands(process.env.CLIENTID), {
+				body: commands,
+			});
+		}
+
+		console.log('Successfully reloaded application (/) commands.');
+	}
+	catch (error) {
+		console.error(error);
+	}
+})();

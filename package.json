@@ -1,36 +1,18 @@
 {
-  "name": "blookettradingbot",
-  "version": "1.0.0",
-  "description": "Blooket Trading Bot",
-  "main": "index.js",
-  "scripts": {
-    "dev": "nodemon ./src/loader.js",
-    "start": "pm2-runtime start ecosystem.config.js --env production",
-    "deploy": "node ./src/deploy.js"
-  },
-  "author": "Syfe",
-  "license": "ISC",
+  "name": "blooker",
+  "version": "1.1.0",
+  "description": "Blooket Companion Bot with many commands.",
+  "main": "./src/loader.js",
+  "repository": "https://github.com/ItsSyfe/Blooker.git",
+  "author": "Syfe <22247810+ItsSyfe@users.noreply.github.com>",
+  "license": "MIT",
+  "private": true,
   "dependencies": {
-    "@discordjs/builders": "^0.10.0",
-    "@discordjs/rest": "^0.2.0-canary.0",
-    "axios": "^0.24.0",
-    "axios-cookiejar-support": "^4.0.2",
-    "discord-api-types": "^0.26.0",
-    "discord.js": "^13.7.0",
-    "dotenv": "^10.0.0",
-    "nodemon": "^2.0.15",
-    "number-abbreviate": "^2.0.0",
-    "pg": "^8.7.3",
+    "discord.js": "^14.3.0",
+    "pg": "^8.8.0",
     "pg-hstore": "^2.3.4",
-    "pm2": "^5.2.0",
-    "sequelize": "^6.20.1",
-    "sqlite3": "^5.0.8",
-    "tough-cookie": "^4.0.0"
-  },
-  "devDependencies": {
-    "eslint": "^8.5.0"
-  },
-  "engines": {
-    "node": "17.x"
+    "sequelize": "^6.21.4",
+    "sqlite3": "^5.0.11",
+    "winston": "^3.8.1"
   }
 }
