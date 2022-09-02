@@ -1,5 +1,4 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed, MessageButton, MessageActionRow } = require('discord.js');
+const { EmbedBuilder, ButtonBuilder, ActionRowBuilder, ButtonStyle, SlashCommandBuilder } = require('discord.js');
 const ApiHelper = require('../util/ApiHelper');
 const BlookHelper = require('../util/BlookHelper');
 const { embedCreator } = require('../util/EmbedHelper');
@@ -32,7 +31,7 @@ module.exports = {
 			const unlocks = await ApiHelper.getBlooksFromUsername(username);
 
 			if (!unlocks) {
-				const noBlooksEmbed = await new MessageEmbed()
+				const noBlooksEmbed = await new EmbedBuilder()
 					.setColor('#0099ff')
 					.setTitle(`${username}'s Inventory`)
 					.setURL(`https://dashboard.blooket.com/stats?name=${username}`)
@@ -65,51 +64,51 @@ module.exports = {
 				sellValue += blookData.sellValue > 0 ? blookData.sellValue * unlocks[blook] : 0;
 			}
 
-			const navRow = new MessageActionRow()
+			const navRow = new ActionRowBuilder()
 				.addComponents(
-					new MessageButton()
+					new ButtonBuilder()
 						.setCustomId('overview')
 						.setLabel('Overview')
-						.setStyle('PRIMARY'),
-					new MessageButton()
+						.setStyle(ButtonStyle.Primary),
+					new ButtonBuilder()
 						.setCustomId('blooks')
 						.setLabel('All Blooks')
-						.setStyle('PRIMARY'),
+						.setStyle(ButtonStyle.Primary),
 				);
 
-			const rareRow = new MessageActionRow()
+			const rareRow = new ActionRowBuilder()
 				.addComponents(
-					new MessageButton()
+					new ButtonBuilder()
 						.setCustomId('mystical')
 						.setLabel('Mystical')
-						.setStyle('SECONDARY'),
-					new MessageButton()
+						.setStyle(ButtonStyle.Secondary),
+					new ButtonBuilder()
 						.setCustomId('chroma')
 						.setLabel('Chroma')
-						.setStyle('SECONDARY'),
-					new MessageButton()
+						.setStyle(ButtonStyle.Secondary),
+					new ButtonBuilder()
 						.setCustomId('legendary')
 						.setLabel('Legendary')
-						.setStyle('SECONDARY'),
+						.setStyle(ButtonStyle.Secondary),
 				);
 
-			const row = new MessageActionRow()
+			const row = new ActionRowBuilder()
 				.addComponents(
-					new MessageButton()
+					new ButtonBuilder()
 						.setCustomId('epic')
 						.setLabel('Epic')
-						.setStyle('SECONDARY'),
-					new MessageButton()
+						.setStyle(ButtonStyle.Secondary),
+					new ButtonBuilder()
 						.setCustomId('rare')
 						.setLabel('Rare')
-						.setStyle('SECONDARY'),
-					new MessageButton()
+						.setStyle(ButtonStyle.Secondary),
+					new ButtonBuilder()
 						.setCustomId('uncommon')
 						.setLabel('Uncommon')
-						.setStyle('SECONDARY'),
+						.setStyle(ButtonStyle.Secondary),
 				);
 
-			const mainMenuEmbed = await new MessageEmbed()
+			const mainMenuEmbed = await new EmbedBuilder()
 				.setColor('#0099ff')
 				.setTitle(`${username}'s Inventory`)
 				.setURL(`https://dashboard.blooket.com/stats?name=${username}`)
@@ -129,7 +128,7 @@ module.exports = {
 				
 				**▸ 🟢 Uncommon:** ${UncommonIntersection.length}/${UncommonBlooks.length} (${Math.round((UncommonIntersection.length / UncommonBlooks.length) * 100)}%)`);
 
-			const blookEmbed = await new MessageEmbed()
+			const blookEmbed = await new EmbedBuilder()
 				.setTitle('All Blooks');
 
 			if (MysticalIntersection.length > 0) {
@@ -138,7 +137,7 @@ module.exports = {
 					const blookName = MysticalIntersection[i];
 					MysticalBlooksList += `**▸** ${blookName}${unlocks[blookName] > 1 ? ` (\`\`${unlocks[blookName]}x\`\`)` : ''}\n`;
 				}
-				blookEmbed.addField('🟣 Mystical', `${MysticalBlooksList}`, true);
+				blookEmbed.addFields({ name: '🟣 Mystical', value: `${MysticalBlooksList}`, inline: true });
 			}
 
 			if (ChromaIntersection.length > 0) {
@@ -147,7 +146,7 @@ module.exports = {
 					const blookName = ChromaIntersection[i];
 					ChromaBlooksList += `**▸** ${blookName}${unlocks[blookName] > 1 ? ` (\`\`${unlocks[blookName]}x\`\`)` : ''}\n`;
 				}
-				blookEmbed.addField('🔵 Chroma', `${ChromaBlooksList}`, true);
+				blookEmbed.addFields({ name: '🔵 Chroma', value: `${ChromaBlooksList}`, inline: true });
 			}
 
 			if (LegendaryIntersection.length > 0) {
@@ -156,7 +155,7 @@ module.exports = {
 					const blookName = LegendaryIntersection[i];
 					LegendaryBlooksList += `**▸** ${blookName}${unlocks[blookName] > 1 ? ` (\`\`${unlocks[blookName]}x\`\`)` : ''}\n`;
 				}
-				blookEmbed.addField('🟠 Legendary', `${LegendaryBlooksList}`, true);
+				blookEmbed.addFields({ name: '🟠 Legendary', value: `${LegendaryBlooksList}`, inline: true });
 			}
 
 			if (EpicIntersection.length > 0) {
@@ -165,7 +164,7 @@ module.exports = {
 					const blookName = EpicIntersection[i];
 					EpicBlooksList += `**▸** ${blookName}${unlocks[blookName] > 1 ? ` (\`\`${unlocks[blookName]}x\`\`)` : ''}\n`;
 				}
-				blookEmbed.addField('🔴 Epic', `${EpicBlooksList}`, true);
+				blookEmbed.addFields({ name: '🔴 Epic', value: `${EpicBlooksList}`, inline: true});
 			}
 
 			if (RareIntersection.length > 0) {
@@ -174,7 +173,7 @@ module.exports = {
 					const blookName = RareIntersection[i];
 					RareBlooksList += `**▸** ${blookName}${unlocks[blookName] > 1 ? ` (\`\`${unlocks[blookName]}x\`\`)` : ''}\n`;
 				}
-				blookEmbed.addField('🔵 Rare', `${RareBlooksList}`, true);
+				blookEmbed.addFields({ name: '🔵 Rare', value: `${RareBlooksList}`, inline: true });
 			}
 
 			if (UncommonIntersection.length > 0) {
@@ -183,7 +182,7 @@ module.exports = {
 					const blookName = UncommonIntersection[i];
 					UncommonBlooksList += `**▸** ${blookName}${unlocks[blookName] > 1 ? ` (\`\`${unlocks[blookName]}x\`\`)` : ''}\n`;
 				}
-				blookEmbed.addField('🟢 Uncommon', `${UncommonBlooksList}`, true);
+				blookEmbed.addFields({ name: '🟢 Uncommon', value: `${UncommonBlooksList}`, inline: true });
 			}
 
 			await interaction.editReply({ content: null, embeds: [ mainMenuEmbed ], components: [ navRow, rareRow, row ] });
@@ -198,7 +197,7 @@ module.exports = {
 
 				const RarityBlooks = await BlookHelper.getBlooksByRarity(i.component.label);
 
-				const rarityEmbed = await new MessageEmbed()
+				const rarityEmbed = await new EmbedBuilder()
 					.setTitle(i.component.label);
 
 				const allBoxes = await BlookHelper.getAllBoxes();
@@ -211,7 +210,7 @@ module.exports = {
 							const blookName = boxBlooks[j];
 							BlooksList += `**▸** ${blookName}${unlocks[blookName] > 1 ? ` (\`\`${unlocks[blookName]}x\`\`)` : ''}\n`;
 						}
-						rarityEmbed.addField(allBoxes[box].boxName, BlooksList, true);
+						rarityEmbed.addFields({ name: allBoxes[box].boxName, value: BlooksList, inline: true });
 					}
 				}
 

@@ -1,4 +1,4 @@
-const { MessageActionRow, MessageButton } = require('discord.js');
+const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { embedCreator } = require('../util/EmbedHelper');
 const ApiHelper = require('../util/ApiHelper');
 
@@ -21,17 +21,17 @@ module.exports = {
 		if (await ApiHelper.checkAccountExists(blooketUsername)) {
 			const code = makeCode(6);
 			const dmEmbed = await embedCreator(undefined, 'Linking process (Step two)', undefined, undefined, `To verify you own the account \`\`${blooketUsername}\`\`, we require you to enter a blooket game with a code as your username, this allows us to do verification.\n\nYour code: ${code}\n\nPlease enter a game and set this as your username, then leave the game, once you've done this click the 'Done' button below.`, undefined, undefined, undefined, undefined, undefined);
-			const row = new MessageActionRow()
+			const row = new ActionRowBuilder()
 				.addComponents(
-					new MessageButton()
+					new ButtonBuilder()
 						.setCustomId('linkDone')
 						.setLabel('Done')
-						.setStyle('SUCCESS'),
+						.setStyle(ButtonStyle.Success),
 
-					new MessageButton()
+					new ButtonBuilder()
 						.setCustomId('linkCancel')
 						.setLabel('Cancel')
-						.setStyle('DANGER'),
+						.setStyle(ButtonStyle.Danger),
 				);
 
 			await interaction.reply({ content: null, embeds: [ dmEmbed ], components: [ row ] });

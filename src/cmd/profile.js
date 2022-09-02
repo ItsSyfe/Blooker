@@ -1,9 +1,8 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
 const ApiHelper = require('../util/ApiHelper');
-const { MessageEmbed } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { embedCreator } = require('../util/EmbedHelper');
 const BlookHelper = require('../util/BlookHelper');
-const { debug } = require('../util/Logger');
+const Logger = require('../util/Logger');
 
 const abbreviateNumber = require('number-abbreviate');
 
@@ -36,7 +35,7 @@ module.exports = {
 
 			const favouriteBlook = Account.blookUsage.length > 0 ? await BlookHelper.getBlook(Object.keys(Account.blookUsage).reduce((a, b) => Account.blookUsage[a] > Account.blookUsage[b] ? a : b)) : false;
 			const date = Date.parse(Account.dateCreated);
-			const profileEmbed = await new MessageEmbed()
+			const profileEmbed = await new EmbedBuilder()
 				.setColor(favouriteBlook.color != undefined ? favouriteBlook.color : '#0099ff')
 				.setTitle(`${Account.name}'s Profile${Account.plan == 'Plus' ? ' **+**' : ''}`)
 				.setURL(`https://dashboard.blooket.com/stats?name=${Account.name}`)
@@ -70,7 +69,7 @@ module.exports = {
 		catch (e) {
 			const accountDoesntExistEmbed = await embedCreator(undefined, 'Can\'t find account!', undefined, undefined, `Couldn't find an account with the username \`\`${username}\`\`, are you sure you've typed the username correct?\n\n*Note: Usernames are case sensitive.*`, undefined, undefined, undefined, undefined, undefined);
 			await interaction.editReply({ content: null, embeds: [ accountDoesntExistEmbed ], components: [ ] });
-			debug(e);
+			Logger.debug(e);
 		}
 	},
 };

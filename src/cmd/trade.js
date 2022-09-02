@@ -1,18 +1,22 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const { embedCreator } = require('../util/EmbedHelper');
+const { SlashCommandBuilder } = require('discord.js');
+const TradeComponents = require('../components/TradeComponents.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('ping')
-		.setDescription('🏓 Test my response time!'),
+		.setName('trade')
+		.setDescription('Create a trade request to put onto the market.'),
 	async execute(interaction) {
-		await interaction.reply('Pinging...');
+		const tradeMenuEmbed = TradeComponents.tradeMenuEmbed;
+		tradeMenuEmbed.setAuthor({ name: interaction.user.username, iconURL: interaction.user.avatarURL() });
+		
+		await interaction.reply({ content: null, embeds: [TradeComponents.tradeMenuEmbed], components: [TradeComponents.tradeMenuRow] });
 
-		interaction.fetchReply()
-			.then (reply => {
-				const pingEmbed = embedCreator(undefined, 'Pong! 🏓', undefined, undefined, `⌛ **Time:** ${reply.createdTimestamp - interaction.createdTimestamp} ms\n⏱️ **WS:** ${interaction.client.ws.ping} ms`, undefined, undefined, undefined, undefined);
-
-				interaction.editReply({ content: null, embeds: [ pingEmbed ] });
-			});
+		await interaction.client.trades.create({
+			discordid: interaction.user.id,
+			tradestatus: 'pending',
+			discordinteractionid: interaction.id,
+			offer: [],
+			request: [],
+		})
 	},
 };

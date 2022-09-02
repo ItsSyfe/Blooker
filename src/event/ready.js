@@ -1,12 +1,13 @@
-const { info, debug } = require('../util/Logger.js');
+const Logger = require('../util/Logger.js');
 
 module.exports = {
 	name: 'ready',
 	once: true,
 	execute(client) {
 		client.account.sync();
-		debug('Initialized');
-		info(`Logged in as ${client.user.tag}`);
+		client.trades.sync();
+		Logger.debug('Initialized');
+		Logger.info(`Logged in as ${client.user.tag}`);
 		client.user.setPresence({ activities: [{ name: 'Blooket Companion Bot', type: 'PLAYING' }] });
 	},
 };

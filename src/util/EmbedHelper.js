@@ -1,4 +1,4 @@
-const { MessageEmbed } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 
 /**
 * Embed Creator made by Syfe (credit if you use it).
@@ -16,7 +16,7 @@ const { MessageEmbed } = require('discord.js');
 * @param {Array} footer Footer of embed. Default: Made with <3, Bot PFP
 */
 exports.embedCreator = (colour, title, url, author, description, thumbnail, fields, image, timestamp, footer) => {
-	const embed = new MessageEmbed()
+	const embed = new EmbedBuilder()
 		.setColor(colour ? colour : '#0099ff')
 		.setTitle(title ? title : 'Title')
 		.setURL(url ? url : undefined)

@@ -1,5 +1,4 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -7,7 +6,7 @@ module.exports = {
 		.setDescription('📖 See all my commands!'),
 	async execute(interaction) {
 
-		const helpEmbed = await new MessageEmbed()
+		const helpEmbed = await new EmbedBuilder()
 			.setColor('#0cc3ce')
 			.setTitle('Blooker Help')
 			.setImage('https://i.imgur.com/FMy136Z.png')

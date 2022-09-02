@@ -1,6 +1,5 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
 const { embedCreator } = require('../util/EmbedHelper');
-const { MessageEmbed } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const ApiHelper = require('../util/ApiHelper');
 const BlookHelper = require('../util/BlookHelper');
 
@@ -37,7 +36,7 @@ module.exports = {
 
 		await interaction.deferReply();
 
-		const linkedAccountsEmbed = new MessageEmbed()
+		const linkedAccountsEmbed = new EmbedBuilder()
 			.setColor('#0099ff')
 			.setTitle(`${user ? user.username : interaction.user.username}'s linked accounts`)
 			.setDescription('These accounts are proven to be owned by this Discord user.');
@@ -45,12 +44,12 @@ module.exports = {
 		for (const username of account.linkedAccounts) {
 			const blooketAccount = await ApiHelper.getAccountFromUsername(username);
 			const blooks = Object.keys(blooketAccount.unlocks);
-			linkedAccountsEmbed.addField(`${blooketAccount.name}${blooketAccount.plan == 'Plus' ? ' **+**' : ''}`,
-				`>>> **Blook Collection:** ${blooks.length}/${BlookHelper.getBlooks().length} (${Math.round(blooks.length / BlookHelper.getBlooks().length * 100)}% complete)
+			linkedAccountsEmbed.addFields({ name: `${blooketAccount.name}${blooketAccount.plan == 'Plus' ? ' **+**' : ''}`,
+				value: `>>> **Blook Collection:** ${blooks.length}/${BlookHelper.getBlooks().length} (${Math.round(blooks.length / BlookHelper.getBlooks().length * 100)}% complete)
 				**Tokens:** ${abbreviateNumber(blooketAccount.tokens)}
 				**Total Tokens:** ${abbreviateNumber(blooketAccount.totalTokens)}
 				**Boxes Opened:** ${abbreviateNumber(blooketAccount.boxesOpened)}
-				**Wins:** ${blooketAccount.wins} (${Math.round(blooketAccount.wins / blooketAccount.gamesPlayed * 100)}% win rate)`);
+				**Wins:** ${blooketAccount.wins} (${Math.round(blooketAccount.wins / blooketAccount.gamesPlayed * 100)}% win rate)`});
 		}
 
 		await interaction.editReply({ content: null, embeds: [ linkedAccountsEmbed ] });

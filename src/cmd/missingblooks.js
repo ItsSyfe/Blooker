@@ -1,5 +1,4 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const ApiHelper = require('../util/ApiHelper');
 const BlookHelper = require('../util/BlookHelper');
 const { embedCreator } = require('../util/EmbedHelper');
@@ -80,34 +79,34 @@ module.exports = {
 				description += '\n**No Missing Blooks!**';
 			}
 
-			const blookEmbed = await new MessageEmbed()
+			const blookEmbed = await new EmbedBuilder()
 				.setColor('#0099ff')
 				.setTitle(`${username}'s Missing Blooket Blooks`)
 				.setURL(`https://dashboard.blooket.com/stats?name=${username}`)
 				.setDescription(description);
 
 			if (MysticalDifference.length > 0) {
-				blookEmbed.addField('Missing Mystical Blooks', `>>> ${MysticalDifference.join(', ')}`);
+				blookEmbed.addFields({ name: 'Missing Mystical Blooks', value: `>>> ${MysticalDifference.join(', ')}` });
 			}
 
 			if (ChromaDifference.length > 0) {
-				blookEmbed.addField('Missing Chroma Blooks', `>>> ${ChromaDifference.join(', ')}`);
+				blookEmbed.addFields({ name: 'Missing Chroma Blooks', value: `>>> ${ChromaDifference.join(', ')}` });
 			}
 
 			if (LegendaryDifference.length > 0) {
-				blookEmbed.addField('Missing Legendary Blooks', `>>> ${LegendaryDifference.join(', ')}`);
+				blookEmbed.addFields({ name: 'Missing Legendary Blooks', value: `>>> ${LegendaryDifference.join(', ')}` });
 			}
 
 			if (EpicDifference.length > 0) {
-				blookEmbed.addField('Missing Epic Blooks', `>>> ${EpicDifference.join(', ')}`);
+				blookEmbed.addFields({ name: 'Missing Epic Blooks', value: `>>> ${EpicDifference.join(', ')}` });
 			}
 
 			if (RareDifference.length > 0) {
-				blookEmbed.addField('Missing Rare Blooks', `>>> ${RareDifference.join(', ')}`);
+				blookEmbed.addFields({ name: 'Missing Rare Blooks', value: `>>> ${RareDifference.join(', ')}` });
 			}
 
 			if (UncommonDifference.length > 0) {
-				blookEmbed.addField('Missing Uncommon Blooks', `>>> ${UncommonDifference.join(', ')}`);
+				blookEmbed.addFields({ name: 'Missing Uncommon Blooks', value: `>>> ${UncommonDifference.join(', ')}` });
 			}
 
 			await interaction.editReply({ content: null, embeds: [ blookEmbed ], components: [ ] });

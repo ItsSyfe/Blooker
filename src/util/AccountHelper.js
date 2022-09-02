@@ -1,4 +1,4 @@
-const { MessageEmbed, MessageActionRow, MessageSelectMenu } = require('discord.js');
+const { EmbedBuilder, ActionRowBuilder, SelectMenuBuilder } = require('discord.js');
 const { embedCreator } = require('../util/EmbedHelper');
 
 module.exports = async function(interaction) {
@@ -12,7 +12,7 @@ module.exports = async function(interaction) {
 	}
 
 	if (account.linkedAccounts.length > 1) {
-		const multipleAccountsEmbed = new MessageEmbed()
+		const multipleAccountsEmbed = new EmbedBuilder()
 			.setTitle('Multiple accounts linked!')
 			.setDescription('Please select the account from the dropdown list below that you wish to view!');
 
@@ -25,9 +25,9 @@ module.exports = async function(interaction) {
 			});
 		}
 
-		const row = new MessageActionRow()
+		const row = new ActionRowBuilder()
 			.addComponents(
-				new MessageSelectMenu()
+				new SelectMenuBuilder()
 					.setCustomId('select')
 					.setPlaceholder('Please select an account')
 					.addOptions(options),

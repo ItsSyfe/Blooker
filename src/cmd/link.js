@@ -1,6 +1,5 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
 const { embedCreator } = require('../util/EmbedHelper');
-const { MessageActionRow, Modal, TextInputComponent } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, Modal, TextInputComponent } = require('discord.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -24,7 +23,7 @@ module.exports = {
 			.setLabel('Please enter your Blooket account name.')
 			.setStyle('SHORT');
 
-		const firstActionRow = new MessageActionRow().addComponents(blooketAccountInput);
+		const firstActionRow = new ActionRowBuilder().addComponents(blooketAccountInput);
 
 		modal.addComponents(firstActionRow);
 
