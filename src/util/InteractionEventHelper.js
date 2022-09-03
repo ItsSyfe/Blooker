@@ -19,8 +19,10 @@ exports.CommandInteraction = async (client, interaction) => {
 exports.ButtonInteraction = async (client, interaction) => {
 	const executor = interaction.user;
 	Logger.debug(`${executor.tag} clicked button: ${interaction.customId}`);
-	const button = client.buttons.get(interaction.customId);
 
+	if (executor.id !== interaction.message.interaction.user.id) return interaction.reply({ content: 'You can\'t use this button.', ephemeral: true });
+
+	const button = client.buttons.get(interaction.customId);
 
 	if (!button) return;
 
@@ -47,6 +49,23 @@ exports.ModalInteraction = async (client, interaction) => {
 	}
 	catch (e) {
 		Logger.error(`Error executing modal: ${modal.data.customId}`);
+		console.log(e);
+	}
+};
+
+exports.SelectMenuInteraction = async (client, interaction) => {
+	const executor = interaction.user;
+	Logger.debug(`${executor.tag} used select menu: ${interaction.customId}`);
+	const selectMenu = client.selectMenus.get(interaction.customId);
+
+	if (!selectMenu) return;
+
+	try {
+		Logger.info(`Executing select menu: ${selectMenu.data.customId}`);
+		await selectMenu.execute(interaction);
+	}
+	catch (e) {
+		Logger.error(`Error executing select menu: ${selectMenu.data.customId}`);
 		console.log(e);
 	}
 };

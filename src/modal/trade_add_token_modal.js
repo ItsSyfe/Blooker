@@ -9,7 +9,10 @@ module.exports = {
 		const tokenAmount = await parseInt(interaction.fields.getTextInputValue('trade_add_token_input')) || 0;
 
 		if (isNaN(tokenAmount) || tokenAmount < 1) {
-			return await interaction.update({ content: null, embeds: [TradeComponents.tradeAddTokenModalEmbedFailed], components: [TradeComponents.tradeMainMenuRow] });
+			const tradeAddTokenModalEmbedFailed = TradeComponents.tradeAddTokenModalEmbedFailed;
+			tradeAddTokenModalEmbedFailed.setAuthor({ name: interaction.user.username, iconURL: interaction.user.avatarURL() });
+
+			return await interaction.update({ content: null, embeds: [tradeAddTokenModalEmbedFailed], components: [TradeComponents.tradeMainMenuRow] });
 		}
 
 		const trade = await interaction.client.trades.findOne({ where: { discordinteractionid: interaction.message.interaction.id } });
@@ -18,6 +21,7 @@ module.exports = {
 		const tradeAddTokenModalEmbedSuccess = new EmbedBuilder()
 			.setTitle('Trade Offer Creation Menu')
 			.setColor('#990000')
+			.setAuthor({ name: interaction.user.username, iconURL: interaction.user.avatarURL() })
 			.setDescription(`Successfully set tokens in offer to **${tokenAmount}** tokens.`);
 
 		await interaction.update({ content: null, embeds: [tradeAddTokenModalEmbedSuccess], components: [TradeComponents.tradeMainMenuRow] });

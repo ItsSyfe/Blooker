@@ -48,6 +48,11 @@ class ApiHelper {
 		await this._initialize();
 		return this.blooks.boxes;
 	}
+
+	async getFullBlookName(shortName) {
+		await this._initialize();
+		return Object.keys(this.blooks.blooks).filter(blook => blook.replace(/\s/g, "").toLowerCase() === shortName)[0];
+	}
 }
 
 module.exports = new ApiHelper();

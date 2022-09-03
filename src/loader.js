@@ -84,6 +84,18 @@ for (const file of modalFiles) {
 }
 
 // --------------------------------
+// Load select menus
+client.selectMenus = new Collection();
+const selectMenuFiles = fs.readdirSync('./src/select/').filter(file => file.endsWith('.js'));
+
+for (const file of selectMenuFiles) {
+	const select = require(`./select/${file}`);
+	Logger.info(`Loading select menu: ${select.data.customId}`);
+	client.selectMenus.set(select.data.customId, select);
+	Logger.debug(`Loaded select menu: ${select.data.customId}`);
+}
+
+// --------------------------------
 // Load events
 const eventFiles = fs.readdirSync('./src/event/').filter(file => file.endsWith('.js'));
 

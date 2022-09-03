@@ -1,5 +1,5 @@
 const TradeComponents = require('../components/TradeComponents.js');
-const { SelectMenuBuilder, ActionRowBuilder } = require('discord.js');
+const { SelectMenuBuilder, ActionRowBuilder, EmbedBuilder } = require('discord.js');
 
 module.exports = {
 	data: {
@@ -17,8 +17,11 @@ module.exports = {
 
 		const trade = await interaction.client.trades.findOne({ where: { discordinteractionid: interaction.message.interaction.id } });
 
-		const tradeAddModifyEmbed = TradeComponents.tradeAddModifyEmbed;
-		tradeAddModifyEmbed.setAuthor({ name: interaction.user.username, iconURL: interaction.user.avatarURL() });
+		const tradeAddModifyEmbed = new EmbedBuilder()
+			.setTitle('Trade Offer Creation Menu')
+			.setColor('#990000')
+			.setDescription('Use the select menu below to remove items from your offer.')
+			.setAuthor({ name: interaction.user.username, iconURL: interaction.user.avatarURL() });
 
 		const selectMenu = new SelectMenuBuilder()
 			.setCustomId('trade_add_modify_select')
@@ -27,7 +30,10 @@ module.exports = {
 		for (const item of trade.offer)  {
 			if (item.type === 'token') {
 				selectMenu.addOptions({ label: `${item.amount} tokens`, value: `remove_token` });
-				tradeAddModifyEmbed.addFields({ name: `Remove tokens`, value: `**${item.amount}** tokens.`, inline: true });
+				tradeAddModifyEmbed.addFields({ name: `Tokens`, value: `\`\`${item.amount}x\`\``, inline: true });
+			} else if (item.type === 'blook') {
+				selectMenu.addOptions({ label: `${item.fullname} ${item.amount}x`, value: `${item.shortname}` });
+				tradeAddModifyEmbed.addFields({ name: `${item.fullname}`, value: `\`\`${item.amount}x\`\``, inline: true });
 			}
 		}
 
@@ -37,5 +43,8 @@ module.exports = {
 			);
 
 		await interaction.update({ content: null, embeds: [tradeAddModifyEmbed], components: [selectMenuRow, TradeComponents.tradeMainMenuRow] });
+
+		// --------------------------------------------
+		// Select menu collector
 	},
 };
