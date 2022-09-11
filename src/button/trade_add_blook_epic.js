@@ -16,11 +16,11 @@ module.exports = {
 		for (let i = 0; i < Math.ceil(epicBlooks.length / 10); i++) {
 			const blooks = epicBlooks.slice(i * 10, (i + 1) * 10);
 			const tradeAddRarityEmbed = new EmbedBuilder()
-				.setTitle('Epic')
-				.setColor('#990000')
-				.setDescription(`Select a blook you'd like to add to your offer.\n\n*If you'd like to recieve any from one of the rarities simply select the first option.*`)
+				.setColor('#0cc3ce')
+				.setFooter({ text: 'Blooker by Syfe', iconURL: await interaction.client.users.fetch('190733468550823945').then(user => user.displayAvatarURL({ dynamic: false })) })
+				.setTitle('Chroma')
+				.setDescription(`Select a blook you'd like to add to your offer.\n\n*If you'd like to recieve any from one of the rarities simply select the first option.*\n\nPage ${i + 1}/${Math.ceil(epicBlooks.length / 10)}`)
 				.setAuthor({ name: interaction.user.username, iconURL: interaction.user.avatarURL() })
-				.setFooter({ text: `Page ${i + 1}/${Math.ceil(epicBlooks.length / 10)}` });
 
 			const selectMenu = new SelectMenuBuilder()
 				.setCustomId('trade_add_blook_select')

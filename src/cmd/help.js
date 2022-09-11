@@ -8,6 +8,7 @@ module.exports = {
 
 		const helpEmbed = await new EmbedBuilder()
 			.setColor('#0cc3ce')
+			.setFooter({ text: 'Blooker by Syfe', iconURL: await interaction.client.users.fetch('190733468550823945').then(user => user.displayAvatarURL({ dynamic: false })) })
 			.setTitle('Blooker Help')
 			.setImage('https://i.imgur.com/FMy136Z.png')
 			.setDescription(`Blooker is a companion bot for [Blooket](https://blooket.com)! We provide useful utility commands that aid you in Blooket, please note that NONE of our commands break Blooket's ToS and we do not have ANY access to your account when using our bot.

@@ -1,7 +1,8 @@
-const { EmbedBuilder, ButtonBuilder, ActionRowBuilder, ButtonStyle, SlashCommandBuilder } = require('discord.js');
-const ApiHelper = require('../util/ApiHelper');
+const { EmbedBuilder, ButtonBuilder, ActionRowBuilder, ButtonStyle, SlashCommandBuilder, AttachmentBuilder } = require('discord.js');
 const BlookHelper = require('../util/BlookHelper');
-const { embedCreator } = require('../util/EmbedHelper');
+const Canvas = require('canvas');
+const BlooketAccountHelper = require('../util/BlooketAccountHelper');
+
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -12,9 +13,14 @@ module.exports = {
 				.setDescription('The username of the user you want to view the blooks of.')),
 	async execute(interaction) {
 		if (!interaction.inGuild()) {
-			const guildOnlyEmbed = await embedCreator(undefined, 'Only available in a server!', undefined, undefined, 'Please make sure to use this command in a discord server! You can join our discord [here](https://discord.gg/8M7CKGWvS2)!', undefined, undefined, undefined, undefined, undefined);
+			const guildOnlyEmbed = new EmbedBuilder()
+				.setFooter({ text: 'Blooker by Syfe', iconURL: await interaction.client.users.fetch('190733468550823945').then(user => user.displayAvatarURL({ dynamic: false })) })
+				.setColor(`#990000`)
+				.setTitle(`Only available in a server!`)
+				.setDescription(`Please make sure to use this command in a discord server! You can join our discord [here](https://discord.gg/8M7CKGWvS2)!`);
 			return await interaction.reply({ content: null, embeds: [ guildOnlyEmbed ] });
 		}
+
 		let username = interaction.options.getString('username');
 		await interaction.deferReply();
 
@@ -27,202 +33,203 @@ module.exports = {
 			username = result;
 		}
 
-		try {
-			const unlocks = await ApiHelper.getBlooksFromUsername(username);
+		if (!await BlooketAccountHelper.doesUserExist(username)) {
+			const userNotFoundEmbed = new EmbedBuilder()
+				.setFooter({ text: 'Blooker by Syfe', iconURL: await interaction.client.users.fetch('190733468550823945').then(user => user.displayAvatarURL({ dynamic: false })) })
+				.setColor(`#990000`)
+				.setTitle(`User not found!`)
+				.setDescription(`Couldn't find a user with the name \`${username}\`!`);
+			return await interaction.editReply({ content: null, embeds: [ userNotFoundEmbed ], components: [ ] });
+		}
 
-			if (!unlocks) {
-				const noBlooksEmbed = await new EmbedBuilder()
-					.setColor('#0099ff')
-					.setTitle(`${username}'s Inventory`)
-					.setURL(`https://dashboard.blooket.com/stats?name=${username}`)
-					.setDescription('**▸ Account has no blooks.**');
-				return await interaction.editReply({ content: null, embeds: [ noBlooksEmbed ], components: [ ] });
-			}
+		const UserBlooks = await BlooketAccountHelper.fetchBlooksByUsername(username);
 
-			const blooks = Object.keys(unlocks);
+		if (Object.keys(UserBlooks).length === 0) {
+			const noBlooksEmbed = new EmbedBuilder()
+				.setFooter({ text: 'Blooker by Syfe', iconURL: await interaction.client.users.fetch('190733468550823945').then(user => user.displayAvatarURL({ dynamic: false })) })
+				.setColor(`#990000`)
+				.setTitle(`No blooks found!`)
+				.setDescription(`Couldn't find any blooks for the user \`${username}\`!`);
+			return await interaction.editReply({ content: null, embeds: [ noBlooksEmbed ], components: [ ] });
+		}
 
-			const AllBlooks = await BlookHelper.getBlooks();
-			const MysticalBlooks = await BlookHelper.getBlooksByRarity('Mystical');
-			const ChromaBlooks = await BlookHelper.getBlooksByRarity('Chroma');
-			const LegendaryBlooks = await BlookHelper.getBlooksByRarity('Legendary');
-			const EpicBlooks = await BlookHelper.getBlooksByRarity('Epic');
-			const RareBlooks = await BlookHelper.getBlooksByRarity('Rare');
-			const UncommonBlooks = await BlookHelper.getBlooksByRarity('Uncommon');
+		const UserBlooksNames = Object.keys(UserBlooks).sort();
 
-			const AllIntersection = AllBlooks.filter(blook => blooks.includes(blook));
-			const MysticalIntersection = MysticalBlooks.filter(blook => blooks.includes(blook));
-			const ChromaIntersection = ChromaBlooks.filter(blook => blooks.includes(blook));
-			const LegendaryIntersection = LegendaryBlooks.filter(blook => blooks.includes(blook));
-			const EpicIntersection = EpicBlooks.filter(blook => blooks.includes(blook));
-			const RareIntersection = RareBlooks.filter(blook => blooks.includes(blook));
-			const UncommonIntersection = UncommonBlooks.filter(blook => blooks.includes(blook));
+		const Image = Canvas.Image;
+		const canvas = Canvas.createCanvas(Math.ceil(UserBlooksNames.length / 24) > 1 ? 7440 : UserBlooksNames.length * 310, Math.ceil(UserBlooksNames.length / 24) * 355);
+		const ctx = canvas.getContext('2d');
+		let x = 0;
+		let y = 0;
+		let completeCounter = 0
 
-			let sellValue = 0;
+		for (let i = 0; i < UserBlooksNames.length; i++) {
+			const blookInfo = await BlookHelper.getBlookByName(UserBlooksNames[i]);
+			const img = new Image();
+			img.onload = async () => {
+				await ctx.drawImage(img, x, y)
 
-			for (const blook of AllIntersection) {
-				const blookData = await BlookHelper.getBlook(blook);
-				sellValue += blookData.sellValue > 0 ? blookData.sellValue * unlocks[blook] : 0;
-			}
+				//console.log(`Finished drawing ${UserBlooksNames[i]} at ${x}, ${y}`);
 
-			const navRow = new ActionRowBuilder()
-				.addComponents(
-					new ButtonBuilder()
-						.setCustomId('overview')
-						.setLabel('Overview')
-						.setStyle(ButtonStyle.Primary),
-					new ButtonBuilder()
-						.setCustomId('blooks')
-						.setLabel('All Blooks')
-						.setStyle(ButtonStyle.Primary),
-				);
-
-			const rareRow = new ActionRowBuilder()
-				.addComponents(
-					new ButtonBuilder()
-						.setCustomId('mystical')
-						.setLabel('Mystical')
-						.setStyle(ButtonStyle.Secondary),
-					new ButtonBuilder()
-						.setCustomId('chroma')
-						.setLabel('Chroma')
-						.setStyle(ButtonStyle.Secondary),
-					new ButtonBuilder()
-						.setCustomId('legendary')
-						.setLabel('Legendary')
-						.setStyle(ButtonStyle.Secondary),
-				);
-
-			const row = new ActionRowBuilder()
-				.addComponents(
-					new ButtonBuilder()
-						.setCustomId('epic')
-						.setLabel('Epic')
-						.setStyle(ButtonStyle.Secondary),
-					new ButtonBuilder()
-						.setCustomId('rare')
-						.setLabel('Rare')
-						.setStyle(ButtonStyle.Secondary),
-					new ButtonBuilder()
-						.setCustomId('uncommon')
-						.setLabel('Uncommon')
-						.setStyle(ButtonStyle.Secondary),
-				);
-
-			const mainMenuEmbed = await new EmbedBuilder()
-				.setColor('#0099ff')
-				.setTitle(`${username}'s Inventory`)
-				.setURL(`https://dashboard.blooket.com/stats?name=${username}`)
-				.setDescription(`**▸ 🎨 Collection total:** ${AllIntersection.length}/${Object.keys(AllBlooks).length} (${Math.round((AllIntersection.length / Object.keys(AllBlooks).length) * 100)}%)
-
-				**▸ <:b_token:998636743941173288>** Sell Value: ${sellValue}
-				
-				**▸ 🟣 Mystical:** ${MysticalIntersection.length}/${MysticalBlooks.length} (${Math.round((MysticalIntersection.length / MysticalBlooks.length) * 100)}%)
-				
-				**▸ 🔵 Chroma:** ${ChromaIntersection.length}/${ChromaBlooks.length} (${Math.round((ChromaIntersection.length / ChromaBlooks.length) * 100)}%)
-				
-				**▸ 🟠 Legendary:** ${LegendaryIntersection.length}/${LegendaryBlooks.length} (${Math.round((LegendaryIntersection.length / LegendaryBlooks.length) * 100)}%)
-				
-				**▸ 🔴 Epic:** ${EpicIntersection.length}/${EpicBlooks.length} (${Math.round((EpicIntersection.length / EpicBlooks.length) * 100)}%)
-				
-				**▸ 🔵 Rare:** ${RareIntersection.length}/${RareBlooks.length} (${Math.round((RareIntersection.length / RareBlooks.length) * 100)}%)
-				
-				**▸ 🟢 Uncommon:** ${UncommonIntersection.length}/${UncommonBlooks.length} (${Math.round((UncommonIntersection.length / UncommonBlooks.length) * 100)}%)`);
-
-			const blookEmbed = await new EmbedBuilder()
-				.setTitle('All Blooks');
-
-			if (MysticalIntersection.length > 0) {
-				let MysticalBlooksList = '';
-				for (let i = 0; i < MysticalIntersection.length; i++) {
-					const blookName = MysticalIntersection[i];
-					MysticalBlooksList += `**▸** ${blookName}${unlocks[blookName] > 1 ? ` (\`\`${unlocks[blookName]}x\`\`)` : ''}\n`;
+				x += 310;
+				if (x >= 7440) {
+					x = 0;
+					y += 355;
 				}
-				blookEmbed.addFields({ name: '🟣 Mystical', value: `${MysticalBlooksList}`, inline: true });
+
+				completeCounter++;
 			}
+			img.onerror = err => { console.log(`${blookInfo.box} | ${blookInfo.id}`) }
+			img.src = `https://blooket.s3.us-east-2.amazonaws.com/blooks/${blookInfo.box}/${blookInfo.id == 'ufo' ? 'UFO' : blookInfo.id}.svg`;
+		}
 
-			if (ChromaIntersection.length > 0) {
-				let ChromaBlooksList = '';
-				for (let i = 0; i < ChromaIntersection.length; i++) {
-					const blookName = ChromaIntersection[i];
-					ChromaBlooksList += `**▸** ${blookName}${unlocks[blookName] > 1 ? ` (\`\`${unlocks[blookName]}x\`\`)` : ''}\n`;
-				}
-				blookEmbed.addFields({ name: '🔵 Chroma', value: `${ChromaBlooksList}`, inline: true });
+		const AllMystical = await BlookHelper.getAllBlookNamesWithRarity('Mystical');
+		const MysticalBlooks = UserBlooksNames.filter(value => AllMystical.includes(value));
+		const AllChroma = await BlookHelper.getAllBlookNamesWithRarity('Chroma');
+		const ChromaBlooks = UserBlooksNames.filter(value => AllChroma.includes(value));
+		const AllLegendary = await BlookHelper.getAllBlookNamesWithRarity('Legendary');
+		const LegendaryBlooks = UserBlooksNames.filter(value => AllLegendary.includes(value));
+		const AllEpic = await BlookHelper.getAllBlookNamesWithRarity('Epic');
+		const EpicBlooks = UserBlooksNames.filter(value => AllEpic.includes(value));
+		const AllRare = await BlookHelper.getAllBlookNamesWithRarity('Rare');
+		const RareBlooks = UserBlooksNames.filter(value => AllRare.includes(value));
+		const AllUncommon = await BlookHelper.getAllBlookNamesWithRarity('Uncommon');
+		const UncommonBlooks = UserBlooksNames.filter(value => AllUncommon.includes(value));
+
+		const overviewEmbed = new EmbedBuilder()
+			.setColor('#0cc3ce')
+			.setFooter({ text: 'Blooker by Syfe', iconURL: await interaction.client.users.fetch('190733468550823945').then(user => user.displayAvatarURL({ dynamic: false })) })
+			.setTitle(`${username}'s Inventory`)
+			.setURL(`https://dashboard.blooket.com/stats?name=${username}`)
+			.setImage(`attachment://blooks.png`)
+			.addFields(
+				{ name: `▸ Collection`, value: `${UserBlooksNames.length}/${await BlookHelper.obtainableBlookCount()} \`\`(${Math.round((UserBlooksNames.length / await BlookHelper.obtainableBlookCount() * 100) * 100) / 100}%)\`\``, inline: true },
+				{ name: '\u200b', value: '\u200b', inline: true },
+				{ name: `▸ Sell Value`, value: `<:newblookettoken:1013531507069042748> ${(await Promise.all(UserBlooksNames.map(async blook => (await BlookHelper.getBlookInfo(blook)).sellValue == -1 ? 0 : (await BlookHelper.getBlookInfo(blook)).sellValue * UserBlooks[blook]))).reduce((partialSum, a) => partialSum + a, 0)}`, inline: true },
+				{ name: `🟣 Mystical`, value: `${MysticalBlooks.length}/${AllMystical.length} \`\`(${Math.round((MysticalBlooks.length / AllMystical.length * 100) * 100) / 100}%)\`\``, inline: true},
+				{ name: '\u200b', value: '\u200b', inline: true },
+				{ name: `🔷 Chroma`, value: `${ChromaBlooks.length}/${AllChroma.length} \`\`(${Math.round((ChromaBlooks.length / AllChroma.length * 100) * 100) / 100}%)\`\``, inline: true},
+				{ name: `🟠 Legendary`, value: `${LegendaryBlooks.length}/${AllLegendary.length} \`\`(${Math.round((LegendaryBlooks.length / AllLegendary.length * 100) * 100) / 100}%)\`\``, inline: true},
+				{ name: '\u200b', value: '\u200b', inline: true },
+				{ name: `🔴 Epic`, value: `${EpicBlooks.length}/${AllEpic.length} \`\`(${Math.round((EpicBlooks.length / AllEpic.length * 100) * 100) / 100}%)\`\``, inline: true},
+				{ name: `🔵 Rare`, value: `${RareBlooks.length}/${AllRare.length} \`\`(${Math.round((RareBlooks.length / AllRare.length * 100) * 100) / 100}%)\`\``, inline: true},
+				{ name: '\u200b', value: '\u200b', inline: true },
+				{ name: `🟢 Uncommon`, value: `${UncommonBlooks.length}/${AllUncommon.length} \`\`(${Math.round((UncommonBlooks.length / AllUncommon.length * 100) * 100) / 100}%)\`\``, inline: true},
+			);
+
+		const firstNavRow = new ActionRowBuilder()
+			.addComponents(
+				new ButtonBuilder()
+					.setCustomId('overview')
+					.setLabel('Overview')
+					.setStyle(ButtonStyle.Primary)
+			);
+
+		const secondNavRow = new ActionRowBuilder()
+			.addComponents(
+				new ButtonBuilder()
+					.setCustomId('Mystical')
+					.setLabel('Mystical')
+					.setStyle(ButtonStyle.Success),
+				new ButtonBuilder()
+					.setCustomId('Chroma')
+					.setLabel('Chroma')
+					.setStyle(ButtonStyle.Success),
+				new ButtonBuilder()
+					.setCustomId('Legendary')
+					.setLabel('Legendary')
+					.setStyle(ButtonStyle.Success),
+			);
+		
+		const thirdNavRow = new ActionRowBuilder()
+			.addComponents(
+				new ButtonBuilder()
+					.setCustomId('Epic')
+					.setLabel('Epic')
+					.setStyle(ButtonStyle.Success),
+				new ButtonBuilder()
+					.setCustomId('Rare')
+					.setLabel('Rare')
+					.setStyle(ButtonStyle.Success),
+				new ButtonBuilder()
+					.setCustomId('Uncommon')
+					.setLabel('Uncommon')
+					.setStyle(ButtonStyle.Success),
+			);
+
+		let blooksOverviewAttachment;
+
+		let timer = setInterval(async function () {
+			if (completeCounter == UserBlooksNames.length) {
+				clearInterval(timer)
+				blooksOverviewAttachment = new AttachmentBuilder(await canvas.createPNGStream(), { name: 'blooks.png' });
+				await interaction.editReply({ embeds: [ overviewEmbed ], files: [ blooksOverviewAttachment ], components: [ firstNavRow, secondNavRow, thirdNavRow ] });
 			}
+		}, 400);
 
-			if (LegendaryIntersection.length > 0) {
-				let LegendaryBlooksList = '';
-				for (let i = 0; i < LegendaryIntersection.length; i++) {
-					const blookName = LegendaryIntersection[i];
-					LegendaryBlooksList += `**▸** ${blookName}${unlocks[blookName] > 1 ? ` (\`\`${unlocks[blookName]}x\`\`)` : ''}\n`;
-				}
-				blookEmbed.addFields({ name: '🟠 Legendary', value: `${LegendaryBlooksList}`, inline: true });
-			}
+		interaction.fetchReply()
+			.then(async message => {
+				const filter = i => i.user.id === interaction.user.id;
 
-			if (EpicIntersection.length > 0) {
-				let EpicBlooksList = '';
-				for (let i = 0; i < EpicIntersection.length; i++) {
-					const blookName = EpicIntersection[i];
-					EpicBlooksList += `**▸** ${blookName}${unlocks[blookName] > 1 ? ` (\`\`${unlocks[blookName]}x\`\`)` : ''}\n`;
-				}
-				blookEmbed.addFields({ name: '🔴 Epic', value: `${EpicBlooksList}`, inline: true});
-			}
+				const collector = message.createMessageComponentCollector({ filter,  time: 120000 });
 
-			if (RareIntersection.length > 0) {
-				let RareBlooksList = '';
-				for (let i = 0; i < RareIntersection.length; i++) {
-					const blookName = RareIntersection[i];
-					RareBlooksList += `**▸** ${blookName}${unlocks[blookName] > 1 ? ` (\`\`${unlocks[blookName]}x\`\`)` : ''}\n`;
-				}
-				blookEmbed.addFields({ name: '🔵 Rare', value: `${RareBlooksList}`, inline: true });
-			}
-
-			if (UncommonIntersection.length > 0) {
-				let UncommonBlooksList = '';
-				for (let i = 0; i < UncommonIntersection.length; i++) {
-					const blookName = UncommonIntersection[i];
-					UncommonBlooksList += `**▸** ${blookName}${unlocks[blookName] > 1 ? ` (\`\`${unlocks[blookName]}x\`\`)` : ''}\n`;
-				}
-				blookEmbed.addFields({ name: '🟢 Uncommon', value: `${UncommonBlooksList}`, inline: true });
-			}
-
-			await interaction.editReply({ content: null, embeds: [ mainMenuEmbed ], components: [ navRow, rareRow, row ] });
-
-			const filter = i => i.user.id === interaction.user.id;
-
-			const collector = interaction.channel.createMessageComponentCollector({ filter, idle: 600000 });
-
-			collector.on('collect', async i => {
-				if (i.customId === 'overview') return await i.update({ content: null, embeds: [ mainMenuEmbed ], components: [ navRow, rareRow, row ] });
-				if (i.customId === 'blooks') return await i.update({ content: null, embeds: [ blookEmbed ], components: [ navRow, rareRow, row ] });
-
-				const RarityBlooks = await BlookHelper.getBlooksByRarity(i.component.label);
-
-				const rarityEmbed = await new EmbedBuilder()
-					.setTitle(i.component.label);
-
-				const allBoxes = await BlookHelper.getAllBoxes();
-
-				for (const box in allBoxes) {
-					const boxBlooks = RarityBlooks.filter(blook => allBoxes[box].blooks.includes(blook));
-					if (boxBlooks.length > 0) {
-						let BlooksList = '';
-						for (let j = 0; j < boxBlooks.length; j++) {
-							const blookName = boxBlooks[j];
-							BlooksList += `**▸** ${blookName}${unlocks[blookName] > 1 ? ` (\`\`${unlocks[blookName]}x\`\`)` : ''}\n`;
-						}
-						rarityEmbed.addFields({ name: allBoxes[box].boxName, value: BlooksList, inline: true });
+				collector.on('collect', async (button) => {
+					if (button.customId === 'overview') {
+						await button.update({ embeds: [ overviewEmbed ], files: [ blooksOverviewAttachment ], components: [ firstNavRow, secondNavRow, thirdNavRow ] });
 					}
-				}
+					else {
+						const BlooksRarity = await BlookHelper.getAllBlookNamesWithRarity(button.customId);
+						const BlooksWithRarity = UserBlooksNames.filter(blook => BlooksRarity.includes(blook));
 
-				if (rarityEmbed.fields.length === 0) rarityEmbed.setDescription('No Blooks');
+						if (BlooksWithRarity.length == 0) {
+							await button.update({ embeds: [ new EmbedBuilder().setFooter({ text: 'Blooker by Syfe', iconURL: await interaction.client.users.fetch('190733468550823945').then(user => user.displayAvatarURL({ dynamic: false })) }).setTitle(`No ${button.customId} blooks!`).setColor(`#990000`).setDescription(`${username} does not have any ${button.customId} blooks.`) ], components: [ firstNavRow, secondNavRow, thirdNavRow ], files: [ ] });
+						}
+						else {
+							const rarityCanvas = Canvas.createCanvas(Math.ceil(BlooksWithRarity.length / 24) > 1 ? 7440 : BlooksWithRarity.length * 310, Math.ceil(BlooksWithRarity.length / 24) * 355);
+							const rarityctx = rarityCanvas.getContext('2d');
+							let x = 0;
+							let y = 0;
+							let completeCounter = 0
 
-				await i.update({ content: null, embeds: [ rarityEmbed ], components: [ navRow, rareRow, row ] });
-			});
-		}
-		catch (err) {
-			console.log(err);
-			const accountDoesntExistEmbed = await embedCreator(undefined, 'Can\'t find account!', undefined, undefined, `Couldn't find an account with the username \`\`${username}\`\`, are you sure you've typed the username correct?\n\n*Note: Usernames are case sensitive.*`, undefined, undefined, undefined, undefined, undefined);
-			await interaction.editReply({ content: null, embeds: [ accountDoesntExistEmbed ], components: [ ] });
-		}
+							for (let i = 0; i < BlooksWithRarity.length; i++) {
+								const blookInfo = await BlookHelper.getBlookByName(BlooksWithRarity[i]);
+								const img = new Image();
+								img.onload = async () => {
+									await rarityctx.drawImage(img, x, y)
+
+									x += 310;
+									if (x >= 7440) {
+										x = 0;
+										y += 355;
+									}
+
+									completeCounter++;
+								}
+								img.onerror = err => { console.log(`${blookInfo.box} | ${blookInfo.id}`) }
+								img.src = `https://blooket.s3.us-east-2.amazonaws.com/blooks/${blookInfo.box}/${blookInfo.id == 'ufo' ? 'UFO' : blookInfo.id}.svg`;
+							}
+
+							const rarityEmbed = new EmbedBuilder()
+								.setFooter({ text: 'Blooker by Syfe', iconURL: await interaction.client.users.fetch('190733468550823945').then(user => user.displayAvatarURL({ dynamic: false })) })
+								.setTitle(`${button.customId} Blooks`)
+								.setColor(button.customId == 'Mystical' ? '#ff00ff' : button.customId == 'Chroma' ? '#00ffff' : button.customId == 'Legendary' ? '#ff0000' : button.customId == 'Epic' ? '#ff0000' : button.customId == 'Rare' ? '#0000ff' : button.customId == 'Uncommon' ? '#00ff00' : '#ffffff')
+								.setDescription(BlooksWithRarity.map(blook => `▸ ${blook} \`${UserBlooks[blook]}x\``).join('\n'))
+								.setImage(`attachment://rarityblooks.png`)
+
+							let timer = setInterval(async function () {
+								if (completeCounter == BlooksWithRarity.length) {
+									clearInterval(timer)
+									const attachment = new AttachmentBuilder(await rarityCanvas.createPNGStream(), { name: 'rarityblooks.png' });
+									await button.update({ embeds: [ rarityEmbed ], files: [ attachment ], components: [ firstNavRow, secondNavRow, thirdNavRow ] });
+								}
+							}, 400);
+						}
+					}
+					await collector.resetTimer();
+				})
+
+				collector.on('end', async () => {
+					await interaction.editReply({ embeds: [ overviewEmbed ], files: [ blooksOverviewAttachment ], components: [ ] });
+				})
+			})
 	},
 };

@@ -1,18 +1,24 @@
 const { EmbedBuilder, ActionRowBuilder, SelectMenuBuilder } = require('discord.js');
-const { embedCreator } = require('../util/EmbedHelper');
 
 module.exports = async function(interaction) {
 	let username;
 	const account = await interaction.client.account.findOne({ where: { discordId: interaction.user.id } });
 
 	if (!account) {
-		const noAccountEmbed = await embedCreator(undefined, 'No Blooket accounts linked!', undefined, undefined, 'Please either enter a username or use /link to link your own account to Discord!', undefined, undefined, undefined, undefined, undefined);
+		const noAccountEmbed = new EmbedBuilder()
+			.setFooter({ text: 'Blooker by Syfe', iconURL: await interaction.client.users.fetch('190733468550823945').then(user => user.displayAvatarURL({ dynamic: false })) })
+			.setColor(`#990000`)
+			.setTitle(`No Blooket accounts linked!`)
+			.setDescription(`Please either enter a username or use /link to link your own account to Discord!`);
+			
 		await interaction.editReply({ content: null, embeds: [ noAccountEmbed ] });
 		return false;
 	}
 
 	if (account.linkedAccounts.length > 1) {
 		const multipleAccountsEmbed = new EmbedBuilder()
+			.setColor('#0cc3ce')
+			.setFooter({ text: 'Blooker by Syfe', iconURL: await interaction.client.users.fetch('190733468550823945').then(user => user.displayAvatarURL({ dynamic: false })) })
 			.setTitle('Multiple accounts linked!')
 			.setDescription('Please select the account from the dropdown list below that you wish to view!');
 
@@ -48,7 +54,12 @@ module.exports = async function(interaction) {
 				}));
 
 		if (!success) {
-			const timeoutEmbed = await embedCreator(undefined, 'Timeout!', undefined, undefined, 'You took too long to respond!', undefined, undefined, undefined, undefined, undefined);
+			const timeoutEmbed = new EmbedBuilder()
+				.setFooter({ text: 'Blooker by Syfe', iconURL: await interaction.client.users.fetch('190733468550823945').then(user => user.displayAvatarURL({ dynamic: false })) })
+				.setColor(`#990000`)
+				.setTitle(`Timeout!`)
+				.setDescription(`You took too long to respond!`);
+
 			await interaction.editReply({ content: null, embeds: [ timeoutEmbed ] });
 			return false;
 		}

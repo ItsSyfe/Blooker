@@ -1,6 +1,5 @@
-const ApiHelper = require('../util/ApiHelper');
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const { embedCreator } = require('../util/EmbedHelper');
+const BlooketAccountHelper = require('../util/BlooketAccountHelper');
 const BlookHelper = require('../util/BlookHelper');
 const Logger = require('../util/Logger');
 
@@ -15,7 +14,12 @@ module.exports = {
 				.setDescription('The username of the user you want to view the profile of.')),
 	async execute(interaction) {
 		if (!interaction.inGuild()) {
-			const guildOnlyEmbed = await embedCreator(undefined, 'Only available in a server!', undefined, undefined, 'Please make sure to use this command in a discord server! You can join our discord [here](https://discord.gg/8M7CKGWvS2)!', undefined, undefined, undefined, undefined, undefined);
+			const guildOnlyEmbed = new EmbedBuilder()
+				.setColor('#990000')
+				.setFooter({ text: 'Blooker by Syfe', iconURL: await interaction.client.users.fetch('190733468550823945').then(user => user.displayAvatarURL({ dynamic: false })) })
+				.setTitle('Only available in a server!')
+				.setDescription('Please make sure to use this command in a discord server! You can join our discord [here](https://discord.gg/8M7CKGWvS2)!');
+
 			return await interaction.reply({ content: null, embeds: [ guildOnlyEmbed ] });
 		}
 
@@ -31,45 +35,50 @@ module.exports = {
 			username = result;
 		}
 		try {
-			const Account = await ApiHelper.getAccountFromUsername(username);
-
-			const favouriteBlook = Account.blookUsage.length > 0 ? await BlookHelper.getBlook(Object.keys(Account.blookUsage).reduce((a, b) => Account.blookUsage[a] > Account.blookUsage[b] ? a : b)) : false;
-			const date = Date.parse(Account.dateCreated);
+			const accountInfo = await BlooketAccountHelper.fetchAccountByUsername(username);
+			
+			const favouriteBlook = await BlookHelper.getBlookInfo(accountInfo.blook);
+			const date = Date.parse(accountInfo.dateCreated);
 			const profileEmbed = await new EmbedBuilder()
+				.setColor('#0cc3ce')
+				.setFooter({ text: `Blooker by Syfe | 💳 ID: ${accountInfo._id.toString()}`, iconURL: await interaction.client.users.fetch('190733468550823945').then(user => user.displayAvatarURL({ dynamic: false })) })
 				.setColor(favouriteBlook.color != undefined ? favouriteBlook.color : '#0099ff')
-				.setTitle(`${Account.name}'s Profile${Account.plan == 'Plus' ? ' **+**' : ''}`)
-				.setURL(`https://dashboard.blooket.com/stats?name=${Account.name}`)
+				.setTitle(`${accountInfo.name}'s Profile${accountInfo.plan == 'Plus' ? ' **+**' : ''}`)
+				.setURL(`https://dashboard.blooket.com/stats?name=${accountInfo.name}`)
 				.setThumbnail(favouriteBlook ? `https://undercovergoose.github.io/blooket-src/blooks/png/${favouriteBlook.box}/${favouriteBlook.id}.png` : '')
-				.setDescription(`**▸ 🏆 Wins:** ${Account.wins} (${Math.round(Account.wins / Account.gamesPlayed * 100)}% win rate)
+				.setDescription(`**▸ 🏆 Wins:** ${accountInfo.wins} (${Math.round(accountInfo.wins / accountInfo.gamesPlayed * 100)}% win rate)
 
-					**▸ 🎖️ Top Five Placements:** ${Account.topFives}
+					**▸ 🎖️ Top Five Placements:** ${accountInfo.topFives}
 
-					**▸ 🎲 Total Games Played:** ${abbreviateNumber(Account.gamesPlayed)}
+					**▸ 🎲 Total Games Played:** ${abbreviateNumber(accountInfo.gamesPlayed)}
 
-					**▸ <:b_token:998636743941173288> Tokens:** ${abbreviateNumber(Account.tokens)}
+					**▸ <:newblookettoken:1013531507069042748> Tokens:** ${abbreviateNumber(accountInfo.tokens)}
 
-					**▸ 🎯 Daily Tokens Available:** ${new Date().setHours(0, 0, 0, 0) != Date.parse(Account.lastTokenDay) && Account.tokensAvailable == 0 ? '500' : Account.tokensAvailable}
+					**▸ 🎯 Daily Tokens Available:** ${new Date().setHours(0, 0, 0, 0) != Date.parse(accountInfo.lastTokenDay) && accountInfo.tokensAvailable == 0 ? '500' : accountInfo.tokensAvailable}
 
-					**▸ 🧪 XP:** ${Account.xp}
+					**▸ 🧪 XP:** ${accountInfo.xp}
 
-					**▸ 🎯 Daily XP Available:** ${new Date().setHours(0, 0, 0, 0) != Date.parse(Account.lastTokenDay) && Account.xpAvailable == 0 ? '300' : Account.xpAvailable}
+					**▸ 🎯 Daily XP Available:** ${new Date().setHours(0, 0, 0, 0) != Date.parse(accountInfo.lastTokenDay) && accountInfo.xpAvailable == 0 ? '300' : accountInfo.xpAvailable}
 
-					**▸ <:b_token:998636743941173288> Total Tokens Earned:** ${abbreviateNumber(Account.totalTokens)}
+					**▸ <:newblookettoken:1013531507069042748> Total Tokens Earned:** ${abbreviateNumber(accountInfo.totalTokens)}
 
-					**▸ 🔓 Boxes Opened:** ${abbreviateNumber(Account.boxesOpened)}
+					**▸ 🔓 Boxes Opened:** ${abbreviateNumber(accountInfo.boxesOpened)}
 
 					**▸ ♻️ Server reset time:** <t:${Math.round(new Date().setHours(24, 0, 0, 0)) / 1000}:R>
 
 					
-					⌛ Created: <t:${Math.floor(date.valueOf() / 1000)}:R> • ${Account.dateCreated.replace(/T/, ' ').replace(/\..+/, '')}`)
-				.setFooter({ text: `💳 ID: ${Account._id.toString()}` });
+					⌛ Created: <t:${Math.floor(date.valueOf() / 1000)}:R> • ${accountInfo.dateCreated.replace(/T/, ' ').replace(/\..+/, '')}`);
 
 			await interaction.editReply({ content: null, embeds: [ profileEmbed ], components: [ ] });
 		}
 		catch (e) {
-			const accountDoesntExistEmbed = await embedCreator(undefined, 'Can\'t find account!', undefined, undefined, `Couldn't find an account with the username \`\`${username}\`\`, are you sure you've typed the username correct?\n\n*Note: Usernames are case sensitive.*`, undefined, undefined, undefined, undefined, undefined);
+			const accountDoesntExistEmbed = new EmbedBuilder()
+				.setColor('#990000')
+				.setFooter({ text: 'Blooker by Syfe', iconURL: await interaction.client.users.fetch('190733468550823945').then(user => user.displayAvatarURL({ dynamic: false })) })
+				.setTitle('Can\'t find account!')
+				.setDescription(`Couldn't find an account with the username \`\`${username}\`\`, are you sure you've typed the username correct?\n\n*Note: Usernames are case sensitive.*`);
 			await interaction.editReply({ content: null, embeds: [ accountDoesntExistEmbed ], components: [ ] });
-			Logger.debug(e);
+			console.log(e);
 		}
 	},
 };

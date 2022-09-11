@@ -21,8 +21,8 @@ exports.tradeMenuRow = new ActionRowBuilder()
 	);
 
 exports.tradeMenuEmbed = new EmbedBuilder()
+	.setColor('#0cc3ce')
 	.setTitle('Trade Offer Creation Menu')
-	.setColor('#990000')
 	.setDescription('Use the buttons below to create a trade offer to put onto the market.\n\n*Note: You can only have a maximum of 10 trade offers at a time.*');
 
 exports.tradeAddRow = new ActionRowBuilder()
@@ -46,8 +46,8 @@ exports.tradeAddRow = new ActionRowBuilder()
 	);
 
 exports.tradeAddEmbed = new EmbedBuilder()
+	.setColor('#0cc3ce')
 	.setTitle('Trade Offer Creation Menu')
-	.setColor('#990000')
 	.setDescription('Select what you\'d like to do to your offer.\n\n*Note: You can "buy" blooks by just requesting for a trade of tokens for a specific blook.*');
 
 exports.tradeMainMenuRow = new ActionRowBuilder()
@@ -59,8 +59,8 @@ exports.tradeMainMenuRow = new ActionRowBuilder()
 	);
 
 exports.tradeAddModifyEmbedNoItems = new EmbedBuilder()
-	.setTitle('Trade Offer Creation Menu')
 	.setColor('#990000')
+	.setTitle('Trade Offer Creation Menu')
 	.setDescription('No items in offer to modify, add items to your offer first.');
 
 exports.tradeAddTokenModal = new ModalBuilder()
@@ -81,8 +81,8 @@ exports.tradeAddTokenModal = new ModalBuilder()
 	);
 
 exports.tradeAddTokenModalEmbedFailed = new EmbedBuilder()
-	.setTitle('Trade Offer Creation Menu')
 	.setColor('#990000')
+	.setTitle('Trade Offer Creation Menu')
 	.setDescription('Please enter a valid number of tokens to add to your offer.');
 
 exports.tradeAddBlookRow = new ActionRowBuilder()
@@ -118,13 +118,13 @@ exports.tradeAddBlookRowExtra = new ActionRowBuilder()
 	);
 
 exports.tradeAddBlookEmbed = new EmbedBuilder()
+	.setColor('#0cc3ce')
 	.setTitle('Trade Offer Creation Menu')
-	.setColor('#990000')
 	.setDescription(`Use the buttons below to add blooks to your offer.\n\n*If you'd like to recieve any from one of the rarities simply select the first option in the rarity menu.*`);
 
 exports.tradeAddBlookEmbedSuccess = new EmbedBuilder()
-	.setTitle('Trade Offer Creation Menu')
-	.setColor('#990000');
+	.setColor('#0cc3ce')
+	.setTitle('Trade Offer Creation Menu');
 
 exports.tradeAddBlookMenuRow = new ActionRowBuilder()
 	.addComponents(

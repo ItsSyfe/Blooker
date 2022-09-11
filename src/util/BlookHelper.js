@@ -5,7 +5,7 @@ class ApiHelper {
 		const axiosInstance = axios.create();
 
 		this.axios = axiosInstance;
-		this.blooks = null;
+		this.json = null;
 	}
 
 	async _doInitialize() {
@@ -21,37 +21,53 @@ class ApiHelper {
 
 	async _initializeFetchJson() {
 		const res = await this.axios.get('https://undercovergoose.github.io/blooket-src/blooks.json');
-		this.blooks = res.data;
+		this.json = res.data;
 	}
 
-	async getBlooks() {
+	async getBlookInfo(blook) {
 		await this._initialize();
-		return this.blooks.obtainable;
+		return this.json.blooks[blook];
 	}
 
-	async getBlooksByRarity(rarity) {
+	async getAllObtainableBlookNames() {
 		await this._initialize();
-		return await Array.from(this.blooks.obtainableRarities[rarity]);
+		return this.json.obtainable;
 	}
 
-	async getBlook(name) {
+	async getAllEventBlookNames() {
 		await this._initialize();
-		return this.blooks.blooks[name];
+		return this.json.eventBlooks;
 	}
 
-	async getBox(id) {
+	async getAllBlookNamesWithRarity(rarity) {
 		await this._initialize();
-		return this.blooks.boxes[id];
+		return this.json.obtainableRarities[rarity];
+	}
+
+	async getBox(name) {
+		await this._initialize();
+		return Object.values(this.json.boxes).filter(box => box.boxName.replace(/\s/g, "").toLowerCase() === name.replace(/\s/g, "").toLowerCase())[0] || null;
 	}
 
 	async getAllBoxes() {
 		await this._initialize();
-		return this.blooks.boxes;
+		return this.json.boxes;
+	}
+
+	async getBlookByName(name) {
+		await this._initialize();
+		const blookName = Object.keys(this.json.blooks).filter(blookName => blookName.replace(/\s/g, "").toLowerCase() === name.replace(/\s/g, "").toLowerCase())[0];
+		return { ...this.json.blooks[blookName], name: blookName } || null;
 	}
 
 	async getFullBlookName(shortName) {
 		await this._initialize();
-		return Object.keys(this.blooks.blooks).filter(blook => blook.replace(/\s/g, "").toLowerCase() === shortName)[0];
+		return Object.keys(this.json.blooks).filter(blook => blook.replace(/\s/g, "").toLowerCase() === shortName)[0];
+	}
+
+	async obtainableBlookCount() {
+		await this._initialize();
+		return this.json.obtainableBlooks;
 	}
 }
 
