@@ -129,12 +129,10 @@ module.exports = {
 				)
 			);
 
-		let blooksOverviewAttachment;
-
 		let timer = setInterval(async function () {
 			if (completeCounter == UserBlooks.length) {
 				clearInterval(timer)
-				blooksOverviewAttachment = new AttachmentBuilder(await canvas.createPNGStream(), { name: 'blooks.png' });
+				const blooksOverviewAttachment = new AttachmentBuilder(await canvas.createPNGStream(), { name: 'blooks.png' });
 				await interaction.editReply({ embeds: [ overviewEmbed ], files: [ blooksOverviewAttachment ], components: [ navRow, selectRow ] });
 			}
 		}, 400);
@@ -147,6 +145,7 @@ module.exports = {
 
 				collector.on('collect', async (button) => {
 					if (button.customId && button.customId === 'overview') {
+						const blooksOverviewAttachment = new AttachmentBuilder(await canvas.createPNGStream(), { name: 'blooks.png' });
 						await button.update({ embeds: [ overviewEmbed ], files: [ blooksOverviewAttachment ], components: [ navRow, selectRow ] });
 					}
 					else {
