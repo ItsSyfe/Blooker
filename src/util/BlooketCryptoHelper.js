@@ -1,4 +1,4 @@
-const crypto = require("crypto")
+const crypto = require("crypto").webcrypto
 const axios = require("axios");
 
 class BlooketCrypto {
