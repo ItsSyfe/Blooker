@@ -1,9 +1,9 @@
-const crypto = require("crypto"),
-  axios = require("axios");
+const crypto = require("crypto")
+const axios = require("axios");
 
 class BlooketCrypto {
   constructor() {
-    this.aesKey, this.buildId, this.cryptoKey;
+    this.aesKey, this.buildId, this.cryptoKey = null;
   }
   async _initialize() {
     return (
