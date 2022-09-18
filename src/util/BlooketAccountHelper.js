@@ -3,7 +3,7 @@ const { wrapper } = require("axios-cookiejar-support");
 const { CookieJar } = require("tough-cookie");
 
 const BlooketCryptoHelper = require("./BlooketCryptoHelper");
-const Logger = require("./logger");
+const Logger = require("./Logger");
 
 class BlooketAccount {
   constructor() {
