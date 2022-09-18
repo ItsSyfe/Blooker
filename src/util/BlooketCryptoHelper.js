@@ -13,7 +13,10 @@ class BlooketCrypto {
     );
   }
   async _doInitialize() {
-    await this._initializeConfig(), await this._initializeCryptoKey();
+    await this._initializeConfig();
+	console.log(this.aesKey);
+	console.log(this.buildId);
+	await this._initializeCryptoKey();
   }
   async _initializeConfig() {
     const i = await this._getBuildConfigExternal();
@@ -49,7 +52,7 @@ class BlooketCrypto {
         new TextEncoder().encode(this.aesKey)
       ),
       { name: "AES-GCM" },
-      !1,
+      false,
       ["encrypt"]
     );
   }
