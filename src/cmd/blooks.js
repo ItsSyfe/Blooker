@@ -2,7 +2,7 @@ const { EmbedBuilder, ButtonBuilder, ActionRowBuilder, ButtonStyle, SlashCommand
 const BlookHelper = require('../util/BlookHelper');
 const Canvas = require('canvas');
 const BlooketAccountHelper = require('../util/BlooketAccountHelper');
-const Logger = require('../util/logger');
+const Logger = require('../util/Logger');
 
 
 module.exports = {
