@@ -1,5 +1,6 @@
 {
   "name": "blooker",
+  "main": "./src/loader.js",
   "packageManager": "yarn@3.2.3",
   "version": "1.1.0",
   "description": "Blooket Companion Bot with many commands.",
@@ -27,7 +28,7 @@
   },
   "scripts": {
     "dev": "NODE_ENV=development node ./src/deploy.js && NODE_ENV=development nodemon ./src/loader.js",
-    "prod": "pm2-runtime start ./src/bot.js --name Blooker",
+    "start": "node ./src/loader.js",
     "deploy": "node ./src/deploy.js",
     "cleardeploy": "node ./src/cleardeploy.js"
   }
