@@ -3,7 +3,7 @@ const TradeComponents = require('../components/TradeComponents.js');
 
 module.exports = {
 	data: {
-		customId: 'trade_preview',
+		customId: 'trade_submit',
 	},
 	async execute(interaction) {
 		const trade = await interaction.client.trades.findOne({ where: { discordinteractionid: interaction.message.interaction.id } });

@@ -1,4 +1,4 @@
-const { EmbedBuilder, ButtonBuilder, ActionRowBuilder, ButtonStyle, SlashCommandBuilder, AttachmentBuilder } = require('discord.js');
+const { EmbedBuilder, ButtonBuilder, ActionRowBuilder, ButtonStyle, SlashCommandBuilder, AttachmentBuilder, SelectMenuBuilder } = require('discord.js');
 const BlookHelper = require('../util/BlookHelper');
 const Canvas = require('canvas');
 const BlooketAccountHelper = require('../util/BlooketAccountHelper');
@@ -43,27 +43,27 @@ module.exports = {
 		}
 
 		const tempUserBlooks = Object.keys(await BlooketAccountHelper.fetchBlooksByUsername(username));
-		const UserBlooks = (await BlookHelper.getAllObtainableBlookNames()).filter(x => !tempUserBlooks.includes(x)).filter(blook => blook !== 'Rainbow Astronaut');
+		const UserBlooks = (await BlookHelper.getAllObtainableBlookNames()).filter(x => !tempUserBlooks.includes(x));
 
 		const Image = Canvas.Image;
-		const canvas = Canvas.createCanvas(Math.ceil(UserBlooks.length / 24) > 1 ? 7440 : UserBlooks.length * 310, Math.ceil(UserBlooks.length / 24) * 355);
+		const canvas = Canvas.createCanvas(Math.ceil(UserBlooks.length / 24) > 1 ? 930 : UserBlooks.length * 47.5, Math.ceil(UserBlooks.length / 24) * 53.125);
 		const ctx = canvas.getContext('2d');
 		let x = 0;
 		let y = 0;
 		let completeCounter = 0
 
 		for (let i = 0; i < UserBlooks.length; i++) {
-			const blookInfo = await BlookHelper.getBlookByName(UserBlooks[i]);
+			const blookInfo = await BlookHelper.getBlookByName(UserBlooks[i] !== "Rainbow Astronaut" ? UserBlooks[i] : "Red Astronaut");
 			const img = new Image();
 			img.onload = async () => {
 				await ctx.drawImage(img, x, y)
 
 				//console.log(`Finished drawing ${UserBlooks[i]} at ${x}, ${y}`);
 
-				x += 310;
-				if (x >= 7440) {
+				x += 47.5;
+				if (x >= 930) {
 					x = 0;
-					y += 355;
+					y += 43.125;
 				}
 
 				completeCounter++;
@@ -106,44 +106,27 @@ module.exports = {
 				{ name: `🟢 Uncommon`, value: `${UncommonBlooks.length}/${AllUncommon.length} \`\`(${Math.round((UncommonBlooks.length / AllUncommon.length * 100) * 100) / 100}%)\`\``, inline: true},
 			);
 
-		const firstNavRow = new ActionRowBuilder()
+		const navRow = new ActionRowBuilder()
 			.addComponents(
 				new ButtonBuilder()
 					.setCustomId('overview')
 					.setLabel('Overview')
-					.setStyle(ButtonStyle.Primary)
+					.setStyle(ButtonStyle.Primary),
 			);
 
-		const secondNavRow = new ActionRowBuilder()
+		const selectRow = new ActionRowBuilder()
 			.addComponents(
-				new ButtonBuilder()
-					.setCustomId('Mystical')
-					.setLabel('Mystical')
-					.setStyle(ButtonStyle.Success),
-				new ButtonBuilder()
-					.setCustomId('Chroma')
-					.setLabel('Chroma')
-					.setStyle(ButtonStyle.Success),
-				new ButtonBuilder()
-					.setCustomId('Legendary')
-					.setLabel('Legendary')
-					.setStyle(ButtonStyle.Success),
-			);
-		
-		const thirdNavRow = new ActionRowBuilder()
-			.addComponents(
-				new ButtonBuilder()
-					.setCustomId('Epic')
-					.setLabel('Epic')
-					.setStyle(ButtonStyle.Success),
-				new ButtonBuilder()
-					.setCustomId('Rare')
-					.setLabel('Rare')
-					.setStyle(ButtonStyle.Success),
-				new ButtonBuilder()
-					.setCustomId('Uncommon')
-					.setLabel('Uncommon')
-					.setStyle(ButtonStyle.Success),
+				new SelectMenuBuilder()
+					.setCustomId('rarityselect')
+					.setPlaceholder('Select a rarity')
+					.addOptions(
+						{ label: 'Mystical', value: 'Mystical' },
+						{ label: 'Chroma', value: 'Chroma' },
+						{ label: 'Legendary', value: 'Legendary' },
+						{ label: 'Epic', value: 'Epic' },
+						{ label: 'Rare', value: 'Rare' },
+						{ label: 'Uncommon', value: 'Uncommon' },
+				)
 			);
 
 		let blooksOverviewAttachment;
@@ -152,7 +135,7 @@ module.exports = {
 			if (completeCounter == UserBlooks.length) {
 				clearInterval(timer)
 				blooksOverviewAttachment = new AttachmentBuilder(await canvas.createPNGStream(), { name: 'blooks.png' });
-				await interaction.editReply({ embeds: [ overviewEmbed ], files: [ blooksOverviewAttachment ], components: [ firstNavRow, secondNavRow, thirdNavRow ] });
+				await interaction.editReply({ embeds: [ overviewEmbed ], files: [ blooksOverviewAttachment ], components: [ navRow, selectRow ] });
 			}
 		}, 400);
 
@@ -163,33 +146,34 @@ module.exports = {
 				const collector = message.createMessageComponentCollector({ filter,  time: 120000 });
 
 				collector.on('collect', async (button) => {
-					if (button.customId === 'overview') {
-						await button.update({ embeds: [ overviewEmbed ], files: [ blooksOverviewAttachment ], components: [ firstNavRow, secondNavRow, thirdNavRow ] });
+					if (button.customId && button.customId === 'overview') {
+						await button.update({ embeds: [ overviewEmbed ], files: [ blooksOverviewAttachment ], components: [ navRow, selectRow ] });
 					}
 					else {
-						const BlooksRarity = await BlookHelper.getAllBlookNamesWithRarity(button.customId);
-						const BlooksWithRarity = BlooksRarity.filter(blook => UserBlooks.includes(blook)).filter(blook => blook !== 'Rainbow Astronaut');
+						const raritySelected = button.values[0];
+						const BlooksRarity = await BlookHelper.getAllBlookNamesWithRarity(raritySelected);
+						const BlooksWithRarity = BlooksRarity.filter(blook => UserBlooks.includes(blook));
 
 						if (BlooksWithRarity.length == 0) {
-							await button.update({ embeds: [ new EmbedBuilder().setFooter({ text: 'Blooker by Syfe', iconURL: await interaction.client.users.fetch('190733468550823945').then(user => user.displayAvatarURL({ dynamic: false })) }).setTitle(`No ${button.customId} blooks!`).setColor(`#990000`).setDescription(`${username} is not missing any ${button.customId} blooks.`) ], components: [ firstNavRow, secondNavRow, thirdNavRow ], files: [ ] });
+							await button.update({ embeds: [ new EmbedBuilder().setFooter({ text: 'Blooker by Syfe', iconURL: await interaction.client.users.fetch('190733468550823945').then(user => user.displayAvatarURL({ dynamic: false })) }).setTitle(`No ${raritySelected} blooks!`).setColor(`#990000`).setDescription(`${username} is not missing any ${raritySelected} blooks.`) ], components: [ navRow, selectRow ], files: [ ] });
 						}
 						else {
-							const rarityCanvas = Canvas.createCanvas(Math.ceil(BlooksWithRarity.length / 24) > 1 ? 7440 : BlooksWithRarity.length * 310, Math.ceil(BlooksWithRarity.length / 24) * 355);
+							const rarityCanvas = Canvas.createCanvas(Math.ceil(BlooksWithRarity.length / 24) > 1 ? 930 : BlooksWithRarity.length * 47.5, Math.ceil(BlooksWithRarity.length / 24) * 53.125);
 							const rarityctx = rarityCanvas.getContext('2d');
 							let x = 0;
 							let y = 0;
 							let completeCounter = 0
 
 							for (let i = 0; i < BlooksWithRarity.length; i++) {
-								const blookInfo = await BlookHelper.getBlookByName(BlooksWithRarity[i]);
+								const blookInfo = await BlookHelper.getBlookByName(BlooksWithRarity[i] !== "Rainbow Astronaut" ? BlooksWithRarity[i] : "Red Astronaut");
 								const img = new Image();
 								img.onload = async () => {
-									await rarityctx.drawImage(img, x, y)
+									await rarityctx.drawImage(img, x, y, 37.5, 43.125)
 
-									x += 310;
-									if (x >= 7440) {
+									x += 47.5;
+									if (x >= 930) {
 										x = 0;
-										y += 355;
+										y += 43.125;
 									}
 
 									completeCounter++;
@@ -200,8 +184,8 @@ module.exports = {
 
 							const rarityEmbed = new EmbedBuilder()
 								.setFooter({ text: 'Blooker by Syfe', iconURL: await interaction.client.users.fetch('190733468550823945').then(user => user.displayAvatarURL({ dynamic: false })) })
-								.setTitle(`${button.customId} Blooks`)
-								.setColor(button.customId == 'Mystical' ? '#ff00ff' : button.customId == 'Chroma' ? '#00ffff' : button.customId == 'Legendary' ? '#ff0000' : button.customId == 'Epic' ? '#ff0000' : button.customId == 'Rare' ? '#0000ff' : button.customId == 'Uncommon' ? '#00ff00' : '#ffffff')
+								.setTitle(`${raritySelected} Blooks`)
+								.setColor(raritySelected == 'Mystical' ? '#ff00ff' : raritySelected == 'Chroma' ? '#00ffff' : raritySelected == 'Legendary' ? '#ff0000' : raritySelected == 'Epic' ? '#ff0000' : raritySelected == 'Rare' ? '#0000ff' : raritySelected == 'Uncommon' ? '#00ff00' : '#ffffff')
 								.setDescription(BlooksWithRarity.map(blook => `▸ ${blook}`).join('\n'))
 								.setImage(`attachment://rarityblooks.png`)
 
@@ -209,7 +193,7 @@ module.exports = {
 								if (completeCounter == BlooksWithRarity.length) {
 									clearInterval(timer)
 									const attachment = new AttachmentBuilder(await rarityCanvas.createPNGStream(), { name: 'rarityblooks.png' });
-									await button.update({ embeds: [ rarityEmbed ], files: [ attachment ], components: [ firstNavRow, secondNavRow, thirdNavRow ] });
+									await button.update({ embeds: [ rarityEmbed ], files: [ attachment ], components: [ navRow, selectRow ] });
 								}
 							}, 400);
 						}
@@ -218,7 +202,8 @@ module.exports = {
 				})
 
 				collector.on('end', async () => {
-					await interaction.editReply({ embeds: [ overviewEmbed ], files: [ blooksOverviewAttachment ], components: [ ] });
+					const attachment = new AttachmentBuilder(await canvas.createPNGStream(), { name: 'blooks.png' });
+					await interaction.editReply({ embeds: [ overviewEmbed ], files: [ attachment ], components: [ ] });
 				})
 			})
 	},

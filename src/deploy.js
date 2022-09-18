@@ -4,8 +4,6 @@ const fs = require('node:fs');
 const dotenv = require('dotenv');
 dotenv.config();
 
-const isDevelopment = process.env.NODE_ENV === 'development';
-
 const commands = [];
 const commandFiles = fs
 	.readdirSync('./src/cmd')
@@ -22,20 +20,9 @@ const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
 	try {
 		console.log('Started refreshing application (/) commands.');
 
-		if (isDevelopment) {
-			await rest.put(
-				Routes.applicationGuildCommands(
-					process.env.CLIENTID,
-					process.env.GUILDID,
-				),
-				{ body: commands },
-			);
-		}
-		else {
-			await rest.put(Routes.applicationCommands(process.env.CLIENTID), {
-				body: commands,
-			});
-		}
+		await rest.put(Routes.applicationCommands(process.env.CLIENTID), {
+			body: commands,
+		});
 
 		console.log('Successfully reloaded application (/) commands.');
 	}

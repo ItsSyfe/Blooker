@@ -8,11 +8,20 @@ require('dotenv').config();
 // --------------------------------
 // Database initialization
 const { Sequelize, DataTypes } = require("sequelize");
-const sequelize = new Sequelize({
-  dialect: "sqlite",
-  storage: "./data/database.sqlite",
-  logging: false
-});
+const sequelize = process.env.DATABASE_URL ? 
+new Sequelize(process.env.DATABASE_URL, {
+	ssl: {
+		require: true,
+		rejectUnauthorized: false,
+	},
+	logging: false
+  })
+  : 
+new Sequelize({
+	dialect: "sqlite",
+	storage: "./data/database.sqlite",
+	logging: false
+})
 
 sequelize
   .authenticate()
@@ -36,15 +45,15 @@ client.account = sequelize.define('account', {
 });
 
 client.trades = sequelize.define('trades', {
-	tradeid : {
-		type: DataTypes.UUID,
-		defaultValue: DataTypes.UUIDV4
-	},
 	discordid: DataTypes.STRING,
-	tradestatus: DataTypes.STRING, // pending, created, sold, cancelled
 	discordinteractionid : DataTypes.INTEGER,
+	tradestatus: DataTypes.STRING, // pending, complete, sold, cancelled
 	offer: DataTypes.JSON,
 	request: DataTypes.JSON,
+	verified: {
+		type: DataTypes.BOOLEAN,
+		defaultValue: false,
+	}
 });
 
 // --------------------------------

@@ -27,7 +27,8 @@
   },
   "scripts": {
     "dev": "NODE_ENV=development node ./src/deploy.js && NODE_ENV=development nodemon ./src/loader.js",
-    "prod": "pm2 start ./src/bot.js --name Blooker",
-    "deploy": "node ./src/deploy.js"
+    "prod": "node ./src/deploy.js && pm2 start ./src/bot.js --name Blooker",
+    "deploy": "node ./src/deploy.js",
+	"cleardeploy": "node ./src/cleardeploy.js"
   }
 }
