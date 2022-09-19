@@ -48,26 +48,26 @@ module.exports = {
 				.setThumbnail(favouriteBlook ? `https://undercovergoose.github.io/blooket-src/blooks/png/${favouriteBlook.box}/${favouriteBlook.id}.png` : '')
 				.setDescription(`**▸ 🏆 Wins:** ${accountInfo.wins} (${Math.round(accountInfo.wins / accountInfo.gamesPlayed * 100)}% win rate)
 
-					**▸ 🎖️ Top Five Placements:** ${accountInfo.topFives}
+**▸ 🎖️ Top Five Placements:** ${accountInfo.topFives}
 
-					**▸ 🎲 Total Games Played:** ${abbreviateNumber(accountInfo.gamesPlayed)}
+**▸ 🎲 Total Games Played:** ${abbreviateNumber(accountInfo.gamesPlayed)}
 
-					**▸ <:newblookettoken:1013531507069042748> Tokens:** ${abbreviateNumber(accountInfo.tokens)}
+**▸ <:newblookettoken:1013531507069042748> Tokens:** ${abbreviateNumber(accountInfo.tokens)}
 
-					**▸ 🎯 Daily Tokens Available:** ${new Date().setHours(0, 0, 0, 0) != Date.parse(accountInfo.lastTokenDay) && accountInfo.tokensAvailable == 0 ? '500' : accountInfo.tokensAvailable}
+**▸ 🎯 Daily Tokens Available:** ${new Date().setHours(0, 0, 0, 0) != Date.parse(accountInfo.lastTokenDay) && accountInfo.tokensAvailable == 0 ? '500' : accountInfo.tokensAvailable}
 
-					**▸ 🧪 XP:** ${accountInfo.xp}
+**▸ 🧪 XP:** ${accountInfo.xp}
 
-					**▸ 🎯 Daily XP Available:** ${new Date().setHours(0, 0, 0, 0) != Date.parse(accountInfo.lastTokenDay) && accountInfo.xpAvailable == 0 ? '300' : accountInfo.xpAvailable}
+**▸ 🎯 Daily XP Available:** ${new Date().setHours(0, 0, 0, 0) != Date.parse(accountInfo.lastTokenDay) && accountInfo.xpAvailable == 0 ? '300' : accountInfo.xpAvailable}
 
-					**▸ <:newblookettoken:1013531507069042748> Total Tokens Earned:** ${abbreviateNumber(accountInfo.totalTokens)}
+**▸ <:newblookettoken:1013531507069042748> Total Tokens Earned:** ${abbreviateNumber(accountInfo.totalTokens)}
 
-					**▸ 🔓 Boxes Opened:** ${abbreviateNumber(accountInfo.boxesOpened)}
+**▸ 🔓 Boxes Opened:** ${abbreviateNumber(accountInfo.boxesOpened)}
 
-					**▸ ♻️ Server reset time:** <t:${Math.round(new Date().setHours(24, 0, 0, 0)) / 1000}:R>
+**▸ ♻️ Server reset time:** <t:${Math.round(new Date().setHours(24, 0, 0, 0)) / 1000}:R>
 
-					
-					⌛ Created: <t:${Math.floor(date.valueOf() / 1000)}:R> • ${accountInfo.dateCreated.replace(/T/, ' ').replace(/\..+/, '')}`);
+
+⌛ Created: <t:${Math.floor(date.valueOf() / 1000)}:R> • ${accountInfo.dateCreated.replace(/T/, ' ').replace(/\..+/, '')}`);
 
 			await interaction.editReply({ content: null, embeds: [ profileEmbed ], components: [ ] });
 		}

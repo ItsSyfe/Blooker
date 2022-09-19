@@ -1,5 +1,5 @@
 const { Client, Collection, GatewayIntentBits } = require('discord.js');
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({ intents: [GatewayIntentBits.Guilds], allowedMentions: { parse: ['roles'], repliedUser: false } });
 
 const fs = require('node:fs');
 const Logger = require('./util/Logger');

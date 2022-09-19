@@ -14,8 +14,6 @@ class BlooketCrypto {
   }
   async _doInitialize() {
     await this._initializeConfig();
-	console.log(this.aesKey);
-	console.log(this.buildId);
 	await this._initializeCryptoKey();
   }
   async _initializeConfig() {

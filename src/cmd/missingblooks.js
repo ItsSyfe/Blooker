@@ -46,25 +46,17 @@ module.exports = {
 		const UserBlooks = (await BlookHelper.getAllObtainableBlookNames()).filter(x => !tempUserBlooks.includes(x));
 
 		const Image = Canvas.Image;
-		const canvas = Canvas.createCanvas(Math.ceil(UserBlooks.length / 24) > 1 ? 930 : UserBlooks.length * 47.5, Math.ceil(UserBlooks.length / 24) * 53.125);
+		const canvas = Canvas.createCanvas(Math.ceil(UserBlooks.length / 24) > 1 ? 1140 : UserBlooks.length * 47.5, Math.ceil(UserBlooks.length / 24) * 48.125);
 		const ctx = canvas.getContext('2d');
-		let x = 0;
-		let y = 0;
 		let completeCounter = 0
 
 		for (let i = 0; i < UserBlooks.length; i++) {
 			const blookInfo = await BlookHelper.getBlookByName(UserBlooks[i] !== "Rainbow Astronaut" ? UserBlooks[i] : "Red Astronaut");
 			const img = new Image();
 			img.onload = async () => {
-				await ctx.drawImage(img, x, y)
+				await ctx.drawImage(img, (i - (Math.trunc(i/24) * 24)) * 47.5, (Math.trunc(i/24)) * 43.125, 37.5, 43.125)
 
 				//console.log(`Finished drawing ${UserBlooks[i]} at ${x}, ${y}`);
-
-				x += 47.5;
-				if (x >= 930) {
-					x = 0;
-					y += 43.125;
-				}
 
 				completeCounter++;
 			}
@@ -152,28 +144,28 @@ module.exports = {
 						const raritySelected = button.values[0];
 						const BlooksRarity = await BlookHelper.getAllBlookNamesWithRarity(raritySelected);
 						const BlooksWithRarity = BlooksRarity.filter(blook => UserBlooks.includes(blook));
+						let BlooksByBox = { };
+						const allBoxes = await BlookHelper.getAllBoxes();
+						for(const box in allBoxes) {
+							const boxInfo = allBoxes[box];
+							const BlooksInBox = boxInfo.blooks.filter(blook => BlooksWithRarity.includes(blook));
+							if (BlooksInBox.length > 0) BlooksByBox[boxInfo.boxName] = BlooksInBox;
+						}
+						BlooksByBox = Object.entries(BlooksByBox).sort((a, b) => b[1].length - a[1].length);
 
 						if (BlooksWithRarity.length == 0) {
 							await button.update({ embeds: [ new EmbedBuilder().setFooter({ text: 'Blooker by Syfe', iconURL: await interaction.client.users.fetch('190733468550823945').then(user => user.displayAvatarURL({ dynamic: false })) }).setTitle(`No ${raritySelected} blooks!`).setColor(`#990000`).setDescription(`${username} is not missing any ${raritySelected} blooks.`) ], components: [ navRow, selectRow ], files: [ ] });
 						}
 						else {
-							const rarityCanvas = Canvas.createCanvas(Math.ceil(BlooksWithRarity.length / 24) > 1 ? 930 : BlooksWithRarity.length * 47.5, Math.ceil(BlooksWithRarity.length / 24) * 53.125);
+							const rarityCanvas = Canvas.createCanvas(Math.ceil(BlooksWithRarity.length / 24) > 1 ? 1140 : BlooksWithRarity.length * 47.5, Math.ceil(BlooksWithRarity.length / 24) * 58.125);
 							const rarityctx = rarityCanvas.getContext('2d');
-							let x = 0;
-							let y = 0;
 							let completeCounter = 0
 
 							for (let i = 0; i < BlooksWithRarity.length; i++) {
 								const blookInfo = await BlookHelper.getBlookByName(BlooksWithRarity[i] !== "Rainbow Astronaut" ? BlooksWithRarity[i] : "Red Astronaut");
 								const img = new Image();
 								img.onload = async () => {
-									await rarityctx.drawImage(img, x, y, 37.5, 43.125)
-
-									x += 47.5;
-									if (x >= 930) {
-										x = 0;
-										y += 43.125;
-									}
+									await rarityctx.drawImage(img, (i - (Math.trunc(i/24) * 24)) * 47.5, (Math.trunc(i/24)) * 43.125, 37.5, 43.125)
 
 									completeCounter++;
 								}
@@ -185,8 +177,11 @@ module.exports = {
 								.setFooter({ text: 'Blooker by Syfe', iconURL: await interaction.client.users.fetch('190733468550823945').then(user => user.displayAvatarURL({ dynamic: false })) })
 								.setTitle(`${raritySelected} Blooks`)
 								.setColor(raritySelected == 'Mystical' ? '#ff00ff' : raritySelected == 'Chroma' ? '#00ffff' : raritySelected == 'Legendary' ? '#ff0000' : raritySelected == 'Epic' ? '#ff0000' : raritySelected == 'Rare' ? '#0000ff' : raritySelected == 'Uncommon' ? '#00ff00' : '#ffffff')
-								.setDescription(BlooksWithRarity.map(blook => `▸ ${blook}`).join('\n'))
 								.setImage(`attachment://rarityblooks.png`)
+
+							for(const [box, blooks] of BlooksByBox) {
+								await rarityEmbed.addFields({ name: `${box} Blooks`, value: blooks.map(blook => `▸ ${blook}`).join('\n') });
+							}
 
 							let timer = setInterval(async function () {
 								if (completeCounter == BlooksWithRarity.length) {
