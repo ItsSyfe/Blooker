@@ -14,8 +14,6 @@ module.exports = {
 
 		const blook = await BlookHelper.getBlookByName(interaction.options.getString('blook'));
 
-		console.log(blook.length);
-
 		if (blook.length == 1) {
 			const blookNotFoundEmbed = new EmbedBuilder()
 				.setFooter({ text: 'Blooker by Syfe', iconURL: await interaction.client.users.fetch('190733468550823945').then(user => user.displayAvatarURL({ dynamic: false })) })

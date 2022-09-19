@@ -21,7 +21,7 @@ module.exports = {
 	async execute(interaction) {
 		await interaction.deferReply();
 
-		const box = await BlookHelper.getBox(interaction.options.getString('box'));
+		const box = await BlookHelper.getBoxFullName(interaction.options.getString('box'));
 
 		if (!box) {
 			const boxNotFoundEmbed = new EmbedBuilder()

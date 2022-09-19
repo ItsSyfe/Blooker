@@ -46,7 +46,12 @@ class ApiHelper {
 
 	async getBox(name) {
 		await this._initialize();
-		return Object.values(this.json.boxes).filter(box => box.boxName.replace(/\s/g, "").toLowerCase() === name.replace(/\s/g, "").toLowerCase())[0] || null;
+		return this.json.boxes[Object.keys(this.json.boxes).filter(box => box.replace(/\s/g, "").toLowerCase() === name.replace(/\s/g, "").toLowerCase())[0]];
+	}
+
+	async getBoxFullName(name) {
+		await this._initialize();
+		return Object.values(this.json.boxes).filter(box => box.boxName.replace(/\s/g, "").toLowerCase() === name.replace(/\s/g, "").toLowerCase())[0];
 	}
 
 	async getAllBoxes() {
