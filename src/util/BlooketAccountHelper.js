@@ -2,7 +2,7 @@ const axios = require("axios");
 const { wrapper } = require("axios-cookiejar-support");
 const { CookieJar } = require("tough-cookie");
 
-const BlooketCryptoHelper = require("./BlooketCryptoHelper");
+//const BlooketCryptoHelper = require("./BlooketCryptoHelper");
 const Logger = require("./Logger");
 
 class BlooketAccount {
@@ -22,7 +22,7 @@ class BlooketAccount {
 
 		if (status === 401) {
 			Logger.info(`Blooker Blooket Account session expired, refreshing...`);
-			BlooketCryptoHelper._doInitialize();
+			//BlooketCryptoHelper._doInitialize();
 			await this._doInitialize();
 			return this.axios.request(err.config);
 		}
@@ -47,7 +47,7 @@ class BlooketAccount {
   async _getCookie() {
     await this.axios.get("https://id.blooket.com/api/users/check-auth", {
       headers: {
-        "X-Blooket-Build": await BlooketCryptoHelper.getBuildId(),
+        //"X-Blooket-Build": await BlooketCryptoHelper.getBuildId(),
       },
     });
   }
@@ -62,7 +62,7 @@ class BlooketAccount {
         },
         {
           headers: {
-            "X-Blooket-Build": await BlooketCryptoHelper.getBuildId(),
+            //"X-Blooket-Build": await BlooketCryptoHelper.getBuildId(),
             "Content-Type": "text/plain",
           },
         }
@@ -74,7 +74,7 @@ class BlooketAccount {
     this.session = await this.axios
       .get("https://id.blooket.com/api/users/verify-session", {
         headers: {
-          "X-Blooket-Build": await BlooketCryptoHelper.getBuildId(),
+          //"X-Blooket-Build": await BlooketCryptoHelper.getBuildId(),
         },
       })
       .then((res) => res.data);
