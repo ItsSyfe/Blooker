@@ -1,4 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const BlooketAccountHelper = require('../util/BlooketAccountHelper');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -8,14 +9,13 @@ module.exports = {
 		await interaction.reply('Pinging...');
 
 		await interaction.fetchReply()
-			.then (reply => {
+			.then (async (reply) => {
 				const pingEmbed = new EmbedBuilder()
 					.setColor('#0cc3ce')
-					.setFooter({ text: 'Blooker by Syfe', iconURL: interaction.client.users.fetch('190733468550823945').then(user => user.displayAvatarURL({ dynamic: false })) })
 					.setTitle('Pong! 🏓')
-					.setDescription(`⌛ **Time:** ${reply.createdTimestamp - interaction.createdTimestamp} ms\n⏱️ **WS:** ${interaction.client.ws.ping} ms`);
+					.setDescription(`⌛ **Time:** ${reply.createdTimestamp - interaction.createdTimestamp} ms\n⏱️ **WS:** ${interaction.client.ws.ping} ms\nBlooket API Latency: ${Math.round(await BlooketAccountHelper.getApiLatency())} ms`);
 				
-				interaction.editReply({ content: null, embeds: [ pingEmbed ] });
+				await interaction.editReply({ content: null, embeds: [ pingEmbed ] });
 			});
 	},
 };

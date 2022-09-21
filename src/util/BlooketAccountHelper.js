@@ -1,6 +1,7 @@
 const axios = require("axios");
 const { wrapper } = require("axios-cookiejar-support");
 const { CookieJar } = require("tough-cookie");
+const { performance } = require("perf_hooks");
 
 //const BlooketCryptoHelper = require("./BlooketCryptoHelper");
 const Logger = require("./Logger");
@@ -130,6 +131,14 @@ class BlooketAccount {
   async getLastGameNameFromUsername(username) {
 	const account = await this._fetchBlooketUserByUsername(username);
 	return account.gameHistory[account.gameHistory.length - 1].name || '';
+  }
+
+  async getApiLatency() {
+	await this._initialize();
+	let time = performance.now();
+	return await this.axios.get("https://id.blooket.com/api/users/verify-session", { timeout: 2147483647 })
+		.then(() => performance.now() - time)
+		.catch(() => performance.now() - time);
   }
 }
 
