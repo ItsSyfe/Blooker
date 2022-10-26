@@ -64,7 +64,7 @@ class BlooketAccount {
         {
           headers: {
             //"X-Blooket-Build": await BlooketCryptoHelper.getBuildId(),
-            "Content-Type": "text/plain",
+            "Content-Type": "application/json",
           },
         }
       )
@@ -84,14 +84,14 @@ class BlooketAccount {
   async _fetchBlooketUserByUsername(username) {
 	await this._initialize();
 
-	return await this.axios.get(`https://api.blooket.com/api/users?name=${username}`)
+	return await this.axios.get(`https://dashboard.blooket.com/api/users?name=${username}`)
 		.then(response => response.data);
   }
 
   async _fetchBlooketUserById(id) {
 	await this._initialize();
 
-	return await this.axios.get(`https://api.blooket.com/api/users?id=${id}`)
+	return await this.axios.get(`https://dashboard.blooket.com/api/users?id=${id}`)
 		.then(response => response.data);
   }
 
@@ -123,7 +123,7 @@ class BlooketAccount {
   async doesUserExist(username) {
 	await this._initialize();
 
-	return await this.axios.get(`https://api.blooket.com/api/users?name=${username}`)
+	return await this.axios.get(`https://dashboard.blooket.com/api/users?name=${username}`)
 	.then(res => res.status === 200)
 	.catch(err => err.status === 200);
   }

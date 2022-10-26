@@ -45,7 +45,7 @@ module.exports = {
 				.setColor(favouriteBlook.color != undefined ? favouriteBlook.color : '#0099ff')
 				.setTitle(`${accountInfo.name}'s Profile${accountInfo.plan == 'Plus' ? ' **+**' : ''}`)
 				.setURL(`https://dashboard.blooket.com/stats?name=${accountInfo.name}`)
-				.setThumbnail(favouriteBlook ? `https://undercovergoose.github.io/blooket-src/blooks/png/${favouriteBlook.box}/${favouriteBlook.id}.png` : '')
+				.setThumbnail(favouriteBlook ? `https://undercovergoose.github.io/blooket-src/blooks/${favouriteBlook.box}/${favouriteBlook.id}.png` : '')
 				.setDescription(`**▸ 🏆 Wins:** ${accountInfo.wins} (${Math.round(accountInfo.wins / accountInfo.gamesPlayed * 100)}% win rate)
 
 **▸ 🎖️ Top Five Placements:** ${accountInfo.topFives}

@@ -60,8 +60,8 @@ module.exports = {
 
 				completeCounter++;
 			}
-			img.onerror = err => { console.log(`${blookInfo.box} | ${blookInfo.id}`) }
-			img.src = `https://blooket.s3.us-east-2.amazonaws.com/blooks/${blookInfo.box}/${blookInfo.id == 'ufo' ? 'UFO' : blookInfo.id}.svg`;
+			img.onerror = err => { console.log(err); console.log(`${blookInfo.box} | ${blookInfo.id}`) }
+			img.src = `https://undercovergoose.github.io/blooket-src/blooks/${blookInfo.box}/${blookInfo.id == 'ufo' ? 'UFO' : blookInfo.id}.png`;
 		}
 
 		const AllMystical = await BlookHelper.getAllBlookNamesWithRarity('Mystical');
@@ -169,8 +169,8 @@ module.exports = {
 
 									completeCounter++;
 								}
-								img.onerror = err => { console.log(`${blookInfo.box} | ${blookInfo.id}`) }
-								img.src = `https://blooket.s3.us-east-2.amazonaws.com/blooks/${blookInfo.box}/${blookInfo.id == 'ufo' ? 'UFO' : blookInfo.id}.svg`;
+								img.onerror = err => { console.log(err);console.log(`${blookInfo.box} | ${blookInfo.id}`) }
+								img.src = `https://undercovergoose.github.io/blooket-src/blooks/${blookInfo.box}/${blookInfo.id == 'ufo' ? 'UFO' : blookInfo.id}.png`;
 							}
 
 							const rarityEmbed = new EmbedBuilder()

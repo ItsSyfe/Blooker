@@ -33,7 +33,7 @@ module.exports = {
 
 		for (let i = 0; i < linkedAccounts.length; i++) {
 			const accountInfo = await BlooketAccountHelper.fetchAccountByUsername(linkedAccounts[i]);
-			const accountUnlocks = Object.keys(accountInfo.unlocks);
+			const accountUnlocks = Object.keys(accountInfo.unlocks || {});
 			linkedAccountsEmbed.addFields({ name: linkedAccounts[i], value: 
 				`>>> **Collection**: ${accountUnlocks.length}/${await BlookHelper.obtainableBlookCount()} \`(${Math.round((accountUnlocks.length / await BlookHelper.obtainableBlookCount() * 100) * 100) / 100}%)\`
 				**Tokens:** ${abbreviateNumber(accountInfo.tokens)}
